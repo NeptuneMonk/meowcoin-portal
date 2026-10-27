@@ -21,7 +21,8 @@ A yellow bar on every screen says **DEMO MODE — no real transactions**. The fo
 - **Chats** — conversations you are in. On a phone this is a list. Tap one to open it. On a wide screen the communities sit in a rail, the channels sit beside them, and the chat sits in the middle.
 - **Communities** — a few sample rooms, plus **Create community**. A community has text channels. It can link to the owner’s storefront.
 - **A chat** — messages from the sample cats. Each one cost about a penny. Tap **Burned 374 MEOWE** to see the content id and the Dogecoin record. Those values are simulated. You can type a message or attach a picture from your device.
-- **My store** and **a cat’s storefront** — items that profile minted or holds. Open one. The button says **Trading coming soon**.
+- **My store** and **a cat’s storefront** — items that profile minted or holds. A shelf can hold an image, a video, a sound, a PDF, or a small app. Open one. The button says **Trading coming soon**.
+- **Mint** — add one file or many, including a folder. Pick the main file. The preview stays on this device. An app with `index.html` can be launched in the demo.
 - **Profile** — your picture, your bio, and the communities you own. Choose a profile picture from your device.
 
 There is no global feed. Private messages are not on these screens. They will be end-to-end encrypted. The plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -36,7 +37,7 @@ Deep links use a hash, so they work on GitHub Pages:
 
 ## Pictures you pick
 
-The profile picture, a picture in a chat, and a store item all use your device’s file picker. The preview is local. The demo says **Your image stays on your device in demo mode.** It is not uploaded and it is not stored on a server. Refreshing the page clears it.
+The profile picture and a picture in a chat use your device’s file picker. Minting an item can take many files: images (including gif, webp, and svg), video, audio, PDF, an app folder, or another file. The preview is local. The demo says **Your files stay on your device in demo mode.** They are not uploaded and they are not stored on a server. Refreshing the page clears what you picked. Sample objects that shipped with the demo are bundled in the page.
 
 ## Prices in this demo
 
@@ -110,6 +111,7 @@ These later phases plug in behind the same screens. The buttons and pages stay. 
 - Sample communities, channels, messages, and items are `src/services/catalog.ts`. Anything you forge in the demo is kept in memory and disappears on refresh.
 - `CommunityService` and `ChatService` are the seams for communities and text chats. A live indexer can replace the mock without redrawing the pages.
 - `EncryptionService` is the seam for end-to-end private messages. The mock is `src/services/mockEncryption.ts`.
+- A store item follows Sup’s OBJ fields (`urn`, `nme`, `dsc`, `atr`, `cre`, `own`, `roy`, and the rest) plus a `files` list. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). `src/services/objects.ts` is the helper.
 - The coin picture is the Meowecoin logo from meoweco.in. The cats are original drawings for this demo.
 
 Not financial advice. DYOR.

@@ -26,6 +26,13 @@ export function formatShare(ratio: number): string {
   return `${Math.round(ratio * 100)}%`;
 }
 
+export function formatBytes(size: number): string {
+  if (size < 1024) return `${size} B`;
+  const kb = size / 1024;
+  if (kb < 1024) return `${kb >= 10 ? Math.round(kb) : kb.toFixed(1)} KB`;
+  return `${(kb / 1024).toFixed(1)} MB`;
+}
+
 export function shortHash(value: string, lead = 6, tail = 4): string {
   if (value.length <= lead + tail + 1) return value;
   return `${value.slice(0, lead)}…${value.slice(-tail)}`;

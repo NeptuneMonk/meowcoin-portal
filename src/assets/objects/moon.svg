@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A small night cat">
+  <rect width="240" height="240" fill="#14182a"/>
+  <circle cx="150" cy="78" r="28" fill="#f4ecd6"/>
+  <circle cx="162" cy="70" r="22" fill="#14182a"/>
+  <circle cx="120" cy="140" r="48" fill="#3f3a34"/>
+  <polygon points="78,112 90,70 116,108" fill="#3f3a34"/>
+  <polygon points="162,112 150,70 124,108" fill="#3f3a34"/>
+  <ellipse cx="104" cy="138" rx="6" ry="8" fill="#f0d36a"/>
+  <ellipse cx="136" cy="138" rx="6" ry="8" fill="#f0d36a"/>
+  <path d="M112 156 Q120 164 128 156" fill="none" stroke="#f0d36a" stroke-width="3" stroke-linecap="round"/>
+</svg>

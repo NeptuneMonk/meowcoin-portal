@@ -1,0 +1,22 @@
+html, body { margin: 0; height: 100%; }
+body {
+  display: grid;
+  place-items: center;
+  background: #1a1406;
+  color: #f6edd4;
+  font: 18px ui-rounded, "Segoe UI", sans-serif;
+}
+main { text-align: center; }
+#score { font-weight: 800; font-size: 1.4rem; }
+#cat {
+  width: 140px;
+  height: 140px;
+  border: 0;
+  border-radius: 70px;
+  background: #e2c25a;
+  color: #1a1406;
+  font-weight: 800;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+#cat:active { background: #f0d36a; }

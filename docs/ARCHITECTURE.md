@@ -12,7 +12,40 @@ There are two kinds of things.
 
 One message on its own is not also copied onto Dogecoin. Once a day, the portal writes **one** Dogecoin record for that day. Inside it is a Merkle root: a short fingerprint of every open message from that day. Anyone who still has a message can check it against that fingerprint and show that the message existed that day and was not changed later. The exact hash used to build the fingerprint is still to be confirmed.
 
-**Things a profile owns.** A profile and a storefront item are Dogecoin objects in the Sup style, called P2FK (pay to a future key). The files themselves sit on IPFS. The Dogecoin record is what says who owns the object. We pin every file on our own IPFS node (Kubo), and we also use public pinning services so a file is not kept in only one place. We run our own Dogecoin indexer, which is the reader that turns those records back into profiles, items, communities, and messages.
+**Things a profile owns.** A profile and a storefront item are Dogecoin objects in the Sup style, called P2FK (pay to a future key). The files themselves sit on IPFS. The Dogecoin record is what says who owns the object. We pin every file on our own IPFS node (Kubo), and we also use public pinning services so a file is not kept in only one place. We run our own Dogecoin indexer, which is the reader that turns those records back into profiles, items, communities, and messages. A store item can hold more than one file. The fields are in the Objects section below.
+
+## Objects
+
+A store object is the Sup object, the JSON named `OBJ`. These are the fields in that JSON, from [P2FK/contracts/OBJ.cs](https://github.com/embiimob/Sup/blob/master/P2FK/contracts/OBJ.cs) and the sample [P2FK/samples/Create Object.json](https://github.com/embiimob/Sup/blob/master/P2FK/samples/Create%20Object.json):
+
+| Field | What it is |
+| --- | --- |
+| `urn` | The main reference. It can point at a file. |
+| `uri` | A link. |
+| `img` | A picture reference. Same naming rules as `urn`. |
+| `nme` | Name. |
+| `dsc` | Description. |
+| `atr` | Attributes. A set of short labels and values. |
+| `lic` | License. |
+| `max` | The most units there can be. |
+| `cre` | Creators. Either addresses, or positions in the transaction. |
+| `own` | Who holds how many units. |
+| `roy` | Royalties. Who must receive what percent on a later buy. |
+
+The sample’s comment says `cre`, `own`, and `roy` can use those positions (`0`, `1`, …) or real addresses. Sup then resolves them into an `OBJState`: name, description, URN, URI, image, attributes, license, maximum, creators, owners (units), royalties, listings, offers, created date, change date, lock date, and a change log. Listings and the change log are part of that resolved object. This demo does not invent sale prices for them. The item screen still says **Trading coming soon**.
+
+There is no `files` array inside the OBJ JSON. A single object still reaches more than one file in two ways the source actually shows:
+
+- `urn`, `img`, and `uri` are separate references. The sample’s comment lists the shapes: `IPFS:<cid>` (saved as a file named `artifact`), `IPFS:<cid>/<filename>`, a transaction id plus a filename, a chain prefix such as `MZC:`, `BTC:`, `DOG:`, or `LTC:` plus that same path, or an `http` address.
+- The chain record itself has a `File` map: file name to size in bytes. That map is on the root, not in the OBJ JSON. [SupMain.cs](https://github.com/embiimob/Sup/blob/master/SupMain.cs) chooses a viewer from the extension. Images include gif, webp, and svg. Video includes mp4 and webm. Audio includes mp3, wav, and ogg.
+
+The public site [p2fk.io](https://p2fk.io/) is one page, titled bitFossil. A search uses `GET /GetKnownObjectsBySearchString?searchString=&qty=&skip=&blockchain=`. An object uses `GET /GetObjectByAddress/{address}?mainnet=&verbose=` or `GET /GetObjectByURN/{urn}`. The file bytes for a chain path use `GET /GetRootByTransactionID/{txid}`. Chain filters in the page include `blockchain=MZC` for Mazacoin.
+
+Searching `Water` with no chain filter returned one object, on Bitcoin, not Mazacoin. The same search with `blockchain=MZC` returned an empty list. The Bitcoin object is named “space tree water”. Its URN is a transaction id plus `/SPACETREEWATER.jpg`. Its root `File` map is `{ "SPACETREEWATER.jpg": 20476 }`. Description, image, attributes, and license were empty. Maximum was 0. It has creators, one owner with 1 unit, a 5% royalty, a listing, a created date, and a change log. Those are the fields that response actually contained.
+
+On an object page, p2fk.io shows a preview from the URN’s file name, then the name, a short address, the description, keywords when the object has them, the created date, whether it is locked, which chain the URN points at, the URN itself, creators, owners with their units, royalties as a percent, listings, and provenance. The preview types in that page are image (png, jpeg, gif, webp, svg, avif, bmp), video (mp4, m4v, webm, mov, ogg, ogv), audio (mp3, wav, flac, aac, oga), pdf in a frame, html in a frame, and glb/gltf in a model viewer. Its HTML frame allows scripts and the same origin. The Forge demo does not. A demo app runs from a blob URL in a frame with `sandbox="allow-scripts"` only.
+
+The demo’s `files` list is our stand-in for that root `File` map, plus a MIME type and a CID placeholder for each file. It is not a field Sup’s OBJ JSON has. The main file is the one the viewer opens first, which is the job `urn` has in Sup. Nothing in the demo is uploaded.
 
 ## 2. Private messages
 

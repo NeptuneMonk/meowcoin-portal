@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ScreenHead } from '../components/AppShell';
 import { ItemVisual } from '../components/ItemVisual';
 import { GUEST_HANDLE } from '../services/catalog';
+import { kindLabel } from '../services/objects';
 import { useOwnedCommunities, useProfile, useShelf } from '../services/hooks';
 import type { Item } from '../services/types';
 import { usePageTitle } from '../usePageTitle';
@@ -71,7 +72,10 @@ function ItemTile({ item }: { item: Item }) {
       <ItemVisual item={item} />
       <span>
         <strong>{item.name}</strong>
-        <small>{item.forgedHere ? 'Forged in this demo' : 'Sample item'}</small>
+        <small>
+          {item.files.length > 0 ? kindLabel(item.kind) : 'Sample'}
+          {item.forgedHere ? ' · Forged in this demo' : ''}
+        </small>
       </span>
     </Link>
   );
