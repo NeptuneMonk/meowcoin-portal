@@ -1,6 +1,4 @@
-export type PortalAction = 'post' | 'profile' | 'mint';
-
-export type MemeId = 'forever' | 'ninelives' | 'beside' | 'penny';
+export type PortalAction = 'message' | 'mint' | 'profile' | 'community';
 
 export type ItemArtId = 'medallion' | 'plate' | 'hammer' | 'stamp' | 'scroll' | 'crown';
 
@@ -67,19 +65,8 @@ export interface Profile {
   look: CatLook;
   joinedLabel: string;
   walletLabel: string;
-  forgedHere: boolean;
-}
-
-export interface Post {
-  id: string;
-  handle: string;
-  kind: 'meme' | 'message';
-  text: string;
-  meme: MemeId | null;
-  createdLabel: string;
-  burned: number;
-  cid: string;
-  dogeTxid: string;
+  /** Object URL for a picture picked on this device. Never a remote address. */
+  localImageUrl: string | null;
   forgedHere: boolean;
 }
 
@@ -87,11 +74,49 @@ export interface Item {
   id: string;
   name: string;
   blurb: string;
-  art: ItemArtId;
+  art: ItemArtId | null;
+  /** Object URL for an image picked on this device. Never a remote address. */
+  localImageUrl: string | null;
   creatorHandle: string;
   ownerHandle: string;
-  /** Illustrative marketplace price. Null means it is not listed. */
+  /** Illustrative shelf price. Null means it is not listed for sale. */
   previewMeowe: number | null;
+  cid: string;
+  dogeTxid: string;
+  forgedHere: boolean;
+}
+
+export interface Community {
+  id: string;
+  name: string;
+  topic: string;
+  ownerHandle: string;
+  hue: string;
+  mark: string;
+  forgedHere: boolean;
+}
+
+export interface Channel {
+  id: string;
+  communityId: string;
+  name: string;
+  topic: string;
+}
+
+export interface Membership {
+  communityId: string;
+  handle: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  channelId: string;
+  handle: string;
+  text: string;
+  /** Object URL for an image picked on this device. Seed messages leave this empty. */
+  localImageUrl: string | null;
+  createdLabel: string;
+  burned: number;
   cid: string;
   dogeTxid: string;
   forgedHere: boolean;
@@ -99,25 +124,28 @@ export interface Item {
 
 export type ForgeRequest =
   | {
-      action: 'post';
+      action: 'message';
+      channelId: string;
       text: string;
-      meme: MemeId | null;
+      localImageUrl: string | null;
       quote: FeeQuote;
     }
   | {
       action: 'profile';
-      name: string;
-      handle: string;
-      bio: string;
-      look: CatLook;
-      walletLabel: string;
+      localImageUrl: string;
       quote: FeeQuote;
     }
   | {
       action: 'mint';
       name: string;
       blurb: string;
-      art: ItemArtId;
+      localImageUrl: string;
+      quote: FeeQuote;
+    }
+  | {
+      action: 'community';
+      name: string;
+      topic: string;
       quote: FeeQuote;
     };
 
@@ -171,21 +199,39 @@ export interface RelayerService {
 }
 
 /**
- * Read model for profiles, posts, and items.
+ * Read model for profiles and storefront items.
  * A live Dogecoin indexer replaces the snapshot after it reads the chain.
- * `subscribe` fires when the snapshot changes.
  */
 export interface IndexerService {
   subscribe(listener: () => void): () => void;
-  getPostsSnapshot(): readonly Post[];
   getProfilesSnapshot(): readonly Profile[];
   getItemsSnapshot(): readonly Item[];
 }
 
 /**
+ * Communities ("servers") and their text channels.
+ * A live indexer fills this from Dogecoin records. The mock keeps a snapshot.
+ */
+export interface CommunityService {
+  subscribe(listener: () => void): () => void;
+  getCommunitiesSnapshot(): readonly Community[];
+  getChannelsSnapshot(): readonly Channel[];
+  getMembershipsSnapshot(): readonly Membership[];
+}
+
+/**
+ * Text chats. Messages are the posts: each one carries a burn, a content id,
+ * and a Dogecoin record. There is no voice, call, or audio stream here.
+ */
+export interface ChatService {
+  subscribe(listener: () => void): () => void;
+  getMessagesSnapshot(): readonly ChatMessage[];
+}
+
+/**
  * Demo-only write path. A live indexer learns by reading Dogecoin and Solana,
- * so the real one will not implement this. The mock uses it so a forged post
- * can show up in the tour immediately.
+ * so the real one will not implement this. The mock uses it so a forged
+ * message can show up in the tour immediately.
  */
 export interface DemoForgeSink {
   record(request: ForgeRequest, receipt: ChainReceipt): ForgedRef;

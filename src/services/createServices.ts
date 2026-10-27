@@ -4,6 +4,8 @@ import { MockPricing } from './mockPricing';
 import { MockRelayer } from './mockRelayer';
 import { MockWallet } from './mockWallet';
 import type {
+  ChatService,
+  CommunityService,
   IndexerService,
   IpfsService,
   PricingService,
@@ -22,6 +24,8 @@ export interface PortalServices {
   ipfs: IpfsService;
   relayer: RelayerService;
   indexer: IndexerService;
+  communities: CommunityService;
+  chat: ChatService;
 }
 
 export function createMockServices(): PortalServices {
@@ -33,5 +37,7 @@ export function createMockServices(): PortalServices {
     ipfs,
     relayer: new MockRelayer(ipfs, indexer),
     indexer,
+    communities: indexer,
+    chat: indexer,
   };
 }

@@ -1,28 +1,41 @@
-import { buildCatalog } from './catalog';
+import { buildCatalog, GUEST_HANDLE } from './catalog';
+import { slugHandle } from './ids';
 import type {
   ChainReceipt,
+  Channel,
+  ChatMessage,
+  ChatService,
+  Community,
+  CommunityService,
   DemoForgeSink,
   ForgedRef,
   ForgeRequest,
   IndexerService,
   Item,
-  Post,
+  Membership,
   Profile,
 } from './types';
 
-export class MockIndexer implements IndexerService, DemoForgeSink {
-  private posts: readonly Post[];
+const HUES = ['#d4b235', '#e8963a', '#2ba59a', '#e77fa8', '#8b5cf6'];
+
+export class MockIndexer implements IndexerService, CommunityService, ChatService, DemoForgeSink {
   private profiles: readonly Profile[];
   private items: readonly Item[];
+  private communities: readonly Community[];
+  private channels: readonly Channel[];
+  private memberships: readonly Membership[];
+  private messages: readonly ChatMessage[];
   private listeners = new Set<() => void>();
   private seq = 0;
-  private guestHandle: string | null = null;
 
   constructor() {
     const seed = buildCatalog();
-    this.posts = seed.posts;
     this.profiles = seed.profiles;
     this.items = seed.items;
+    this.communities = seed.communities;
+    this.channels = seed.channels;
+    this.memberships = seed.memberships;
+    this.messages = seed.messages;
   }
 
   subscribe(listener: () => void): () => void {
@@ -30,10 +43,6 @@ export class MockIndexer implements IndexerService, DemoForgeSink {
     return () => {
       this.listeners.delete(listener);
     };
-  }
-
-  getPostsSnapshot(): readonly Post[] {
-    return this.posts;
   }
 
   getProfilesSnapshot(): readonly Profile[] {
@@ -44,76 +53,115 @@ export class MockIndexer implements IndexerService, DemoForgeSink {
     return this.items;
   }
 
+  getCommunitiesSnapshot(): readonly Community[] {
+    return this.communities;
+  }
+
+  getChannelsSnapshot(): readonly Channel[] {
+    return this.channels;
+  }
+
+  getMembershipsSnapshot(): readonly Membership[] {
+    return this.memberships;
+  }
+
+  getMessagesSnapshot(): readonly ChatMessage[] {
+    return this.messages;
+  }
+
   record(request: ForgeRequest, receipt: ChainReceipt): ForgedRef {
     this.seq += 1;
     const n = this.seq;
 
-    if (request.action === 'post') {
-      const handle = this.guestHandle ?? 'you';
-      const post: Post = {
-        id: `forged-post-${n}`,
-        handle,
-        kind: request.meme ? 'meme' : 'message',
+    if (request.action === 'message') {
+      const channel = this.channels.find((entry) => entry.id === request.channelId);
+      if (!channel) throw new Error('That channel is not in this demo.');
+      const message: ChatMessage = {
+        id: `forged-msg-${n}`,
+        channelId: channel.id,
+        handle: GUEST_HANDLE,
         text: request.text.trim(),
-        meme: request.meme,
+        localImageUrl: request.localImageUrl,
         createdLabel: 'Just now',
         burned: request.quote.split.burn,
         cid: receipt.cid,
         dogeTxid: receipt.dogeTxid,
         forgedHere: true,
       };
-      this.posts = [post, ...this.posts];
+      this.messages = [...this.messages, message];
       this.emit();
-      return { id: post.id, handle };
+      return { id: message.id, handle: GUEST_HANDLE };
     }
 
     if (request.action === 'profile') {
-      if (this.profiles.some((profile) => profile.handle === request.handle)) {
-        throw new Error('That name is already in this demo.');
-      }
-      const profile: Profile = {
-        handle: request.handle,
-        name: request.name.trim(),
-        role: 'Forged here',
-        bio: request.bio.trim() || 'A cat in this demo.',
-        look: request.look,
-        joinedLabel: 'Just now',
-        walletLabel: request.walletLabel,
-        forgedHere: true,
-      };
-      this.guestHandle = profile.handle;
-      this.profiles = [profile, ...this.profiles];
-      this.posts = this.posts.map((post) =>
-        post.handle === 'you' ? { ...post, handle: profile.handle } : post,
+      const guest = this.profiles.find((profile) => profile.handle === GUEST_HANDLE);
+      if (!guest) throw new Error('The guest profile is missing.');
+      this.profiles = this.profiles.map((profile) =>
+        profile.handle === GUEST_HANDLE
+          ? { ...profile, localImageUrl: request.localImageUrl }
+          : profile,
       );
-      this.items = this.items.map((entry) => ({
-        ...entry,
-        creatorHandle: entry.creatorHandle === 'you' ? profile.handle : entry.creatorHandle,
-        ownerHandle: entry.ownerHandle === 'you' ? profile.handle : entry.ownerHandle,
-      }));
       this.emit();
-      return { id: profile.handle, handle: profile.handle };
+      return { id: GUEST_HANDLE, handle: GUEST_HANDLE };
     }
 
-    const handle = this.guestHandle ?? 'you';
-    const item: Item = {
+    if (request.action === 'community') {
+      const id = uniqueCommunityId(request.name, this.communities);
+      const community: Community = {
+        id,
+        name: request.name.trim(),
+        topic: request.topic.trim() || 'A new room in this demo.',
+        ownerHandle: GUEST_HANDLE,
+        hue: HUES[n % HUES.length] ?? HUES[0],
+        mark: markFrom(request.name),
+        forgedHere: true,
+      };
+      const channel: Channel = {
+        id: `${id}-general`,
+        communityId: id,
+        name: 'general',
+        topic: 'The front room.',
+      };
+      this.communities = [community, ...this.communities];
+      this.channels = [...this.channels, channel];
+      this.memberships = [...this.memberships, { communityId: id, handle: GUEST_HANDLE }];
+      this.emit();
+      return { id: community.id, handle: GUEST_HANDLE };
+    }
+
+    const minted: Item = {
       id: `forged-item-${n}`,
       name: request.name.trim(),
       blurb: request.blurb.trim() || 'Minted in this demo.',
-      art: request.art,
-      creatorHandle: handle,
-      ownerHandle: handle,
+      art: null,
+      localImageUrl: request.localImageUrl,
+      creatorHandle: GUEST_HANDLE,
+      ownerHandle: GUEST_HANDLE,
       previewMeowe: null,
       cid: receipt.cid,
       dogeTxid: receipt.dogeTxid,
       forgedHere: true,
     };
-    this.items = [item, ...this.items];
+    this.items = [minted, ...this.items];
     this.emit();
-    return { id: item.id, handle };
+    return { id: minted.id, handle: GUEST_HANDLE };
   }
 
   private emit(): void {
     for (const listener of this.listeners) listener();
   }
+}
+
+function uniqueCommunityId(name: string, existing: readonly Community[]): string {
+  const base = slugHandle(name) || 'community';
+  const taken = new Set(existing.map((community) => community.id));
+  if (!taken.has(base)) return base;
+  let n = 2;
+  while (taken.has(`${base}${n}`)) n += 1;
+  return `${base}${n}`;
+}
+
+function markFrom(name: string): string {
+  const letters = name.replace(/[^A-Za-z0-9]/g, '');
+  return (letters.slice(0, 1) || 'C').toUpperCase();
 }

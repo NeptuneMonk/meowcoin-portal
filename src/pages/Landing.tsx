@@ -3,36 +3,43 @@ import coin from '../assets/coin.webp';
 import { BurnCounter } from '../components/BurnCounter';
 import { FeeSplit } from '../components/FeeSplit';
 import { formatMeowe, formatUsd } from '../format';
-import { MINT_QUOTE, POST_QUOTE, PROFILE_QUOTE } from '../services/pricing';
+import {
+  COMMUNITY_QUOTE,
+  MESSAGE_QUOTE,
+  MINT_QUOTE,
+  POST_QUOTE,
+  PROFILE_QUOTE,
+} from '../services/pricing';
 import { usePageTitle } from '../usePageTitle';
 
 const STEPS = [
   {
-    title: 'Compose',
-    body: 'Make a profile, post a meme, or mint an item. You pay only in MEOWE.',
+    title: 'Open a community',
+    body: 'A profile can run its own community, with text channels for the people in it.',
   },
   {
-    title: 'Price in pennies',
-    body: 'A post is one cent. A profile is fifteen cents. The portal turns that into MEOWE.',
+    title: 'A message is a penny',
+    body: 'Sending a message costs about one cent in MEOWE. You can attach a picture from your device.',
   },
   {
     title: 'Split the fee',
     body: '30% is burned forever. 60% is swapped to DOGE to write the record. 10% goes to community nodes.',
   },
   {
-    title: 'Keep the record',
-    body: 'The file is pinned on IPFS. A Solana memo carries the content id. Profiles and items are written on Dogecoin.',
+    title: 'Keep a storefront',
+    body: 'Each profile has a shelf of items that cat minted. Trading comes later.',
   },
+];
+
+const PRICES = [
+  { quote: MESSAGE_QUOTE, label: 'A chat message' },
+  { quote: MINT_QUOTE, label: 'Mint an item' },
+  { quote: PROFILE_QUOTE, label: 'Profile picture' },
+  { quote: COMMUNITY_QUOTE, label: 'A community' },
 ];
 
 export function Landing() {
   usePageTitle('The Forge — MEOWE Portal');
-  const prices = [POST_QUOTE, MINT_QUOTE, PROFILE_QUOTE];
-  const labels: Record<string, string> = {
-    post: 'Post a meme',
-    mint: 'Mint an item',
-    profile: 'Create a profile',
-  };
 
   return (
     <div className="wrap landing">
@@ -44,15 +51,15 @@ export function Landing() {
           </h1>
           <p className="tagline">Memes are forever on Doge.</p>
           <p className="lead">
-            A penny of MEOWE posts a meme, burns a little supply, and leaves a record on Dogecoin.
-            This is a tour of the portal. Nothing here is live.
+            Communities, chats, and a storefront on every profile. A message is about one cent of
+            MEOWE and leaves a record on Dogecoin. This is a tour. Nothing here is live.
           </p>
           <div className="btn-row">
-            <Link className="btn btn-primary" to="/try/post">
-              Try a post
+            <Link className="btn btn-primary" to="/chats">
+              Enter the Forge
             </Link>
-            <Link className="btn btn-ghost" to="/explore">
-              Explore the feed
+            <Link className="btn btn-ghost" to="/communities">
+              See communities
             </Link>
           </div>
           <p className="micro">No wallet. No seed phrase. No payment.</p>
@@ -68,15 +75,15 @@ export function Landing() {
         <h2 id="demo-heading">You are in demo mode</h2>
         <ul>
           <li>Nothing on this page touches Solana, Dogecoin, IPFS, or a wallet.</li>
-          <li>The cats, posts, and items are samples drawn for the tour.</li>
-          <li>Try it walks the real steps, then stops before anything is sent.</li>
+          <li>The cats, communities, and messages are samples drawn for the tour.</li>
+          <li>A picture you pick stays on this device. It is not uploaded.</li>
           <li>There is no seed phrase. If a site asks for one, it is not this demo.</li>
         </ul>
       </section>
 
       <div className="econ">
         <BurnCounter />
-        <FeeSplit quote={POST_QUOTE} heading={`On one post · ${formatUsd(POST_QUOTE.usd)}`} />
+        <FeeSplit quote={POST_QUOTE} heading={`On one message · ${formatUsd(POST_QUOTE.usd)}`} />
       </div>
 
       <section className="section" aria-labelledby="how-heading">
@@ -94,15 +101,14 @@ export function Landing() {
             </li>
           ))}
         </ol>
-        <p className="micro">The marketplace is a preview. Trading comes later.</p>
       </section>
 
       <section className="section" aria-labelledby="price-heading">
         <h2 id="price-heading">Prices in pennies</h2>
         <ul className="price-grid">
-          {prices.map((quote) => (
-            <li key={quote.action} className="card">
-              <p className="kicker">{labels[quote.action]}</p>
+          {PRICES.map(({ quote, label }) => (
+            <li key={label} className="card">
+              <p className="kicker">{label}</p>
               <p className="price-xl">{formatUsd(quote.usd)}</p>
               <p>{formatMeowe(quote.meowe)} MEOWE</p>
               <p className="micro">Burns {formatMeowe(quote.split.burn)} MEOWE</p>
@@ -114,11 +120,11 @@ export function Landing() {
           only pay in MEOWE.
         </p>
         <div className="btn-row">
-          <Link className="btn btn-primary" to="/try">
-            Try the steps
+          <Link className="btn btn-primary" to="/chats">
+            Enter the Forge
           </Link>
-          <Link className="btn btn-ghost" to="/market">
-            Preview the marketplace
+          <Link className="btn btn-ghost" to="/mint">
+            Mint an item
           </Link>
         </div>
       </section>

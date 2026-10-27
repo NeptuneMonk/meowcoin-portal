@@ -17,9 +17,10 @@ export const DOGE_SHARE = 0.6;
 export const NODE_SHARE = 0.1;
 
 export const ACTION_CENTS = {
-  post: 1,
+  message: 1,
   mint: 5,
   profile: 15,
+  community: 15,
 } as const satisfies Record<PortalAction, number>;
 
 export function splitMeowe(meowe: number): FeeSplitAmounts {
@@ -51,11 +52,14 @@ export function quoteAction(action: PortalAction): FeeQuote {
   return quoteFromCents(ACTION_CENTS[action], action);
 }
 
-export const POST_QUOTE = quoteAction('post');
+/** A chat message is the one-penny action. */
+export const MESSAGE_QUOTE = quoteAction('message');
+export const POST_QUOTE = MESSAGE_QUOTE;
 export const MINT_QUOTE = quoteAction('mint');
 export const PROFILE_QUOTE = quoteAction('profile');
+export const COMMUNITY_QUOTE = quoteAction('community');
 
-/** Illustration only: a steady number of posts, at the demo price. */
+/** Illustration only: a steady number of chat messages, at the demo price. */
 export function burnIllustration(postsPerDay = 1000, days = 365) {
   const perPost = POST_QUOTE.split.burn;
   const burned = perPost * postsPerDay * days;
