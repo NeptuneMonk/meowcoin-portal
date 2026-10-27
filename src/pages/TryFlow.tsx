@@ -7,6 +7,7 @@ import { CopyButton } from '../components/CopyButton';
 import { FeeSplit } from '../components/FeeSplit';
 import { ItemArt, ITEM_ARTS } from '../components/ItemArt';
 import { MemeArt, MEMES } from '../components/MemeArt';
+import { SpinningCoin } from '../components/SpinningCoin';
 import { prefersReducedMotion, useCountUp } from '../components/useCountUp';
 import { formatMeowe, formatUsd, shortHash } from '../format';
 import { useProfiles } from '../services/hooks';
@@ -592,6 +593,7 @@ function Done({ action, receipt }: { action: PortalAction; receipt: ForgeReceipt
         </details>
       </section>
       <section className="card coming">
+        <SpinningCoin />
         <h2>This is a demo — coming soon.</h2>
         <p>Nothing was signed or sent. The real Forge will use these same screens.</p>
         <div className="btn-row">
