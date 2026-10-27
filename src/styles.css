@@ -381,6 +381,8 @@ a:hover { color: #fff; }
 .cats {
   display: flex;
   gap: 8px;
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   padding: 2px 2px 12px;
   margin: 0 0 8px;
@@ -410,6 +412,7 @@ a:hover { color: #fff; }
 }
 .filters button[aria-pressed="true"] { background: var(--gold-2); color: var(--ink); border-color: var(--gold-2); }
 .feed-layout, .rail { display: grid; gap: 12px; }
+.feed-layout > * { min-width: 0; }
 .post-list { display: grid; gap: 12px; }
 .post {
   background: rgba(28, 24, 14, 0.9);
