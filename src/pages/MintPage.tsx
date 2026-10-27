@@ -326,7 +326,7 @@ export function MintPage() {
       ) : null}
 
       {flow.step === 'quote' && draft ? (
-        <div className="flow">
+        <div className="card flow">
           <ObjectViewer item={draft} />
           <h2>{draft.name}</h2>
           {draft.blurb ? <p>{draft.blurb}</p> : null}

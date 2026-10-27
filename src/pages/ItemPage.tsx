@@ -24,11 +24,11 @@ export function ItemPage() {
     <div className="fill pad">
       <ScreenHead title={item.name} backTo={back} backLabel="Storefront" />
       <div className="item-detail">
-        <div>
+        <div className="item-stage">
           {item.files.length > 0 ? <ObjectViewer item={item} /> : <ItemVisual item={item} />}
           <FileList files={item.files} mainFileName={item.mainFileName} />
         </div>
-        <div>
+        <div className="item-copy">
           <p>{item.blurb}</p>
           {local ? <p className="micro">Your files stay on your device in demo mode.</p> : null}
           <p className="micro">URN</p>
