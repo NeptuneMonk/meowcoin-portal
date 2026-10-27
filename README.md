@@ -4,6 +4,8 @@ This is a tour of the MEOWE Portal, nicknamed **the Forge**. It is the app where
 
 **This build is a guest demo.** The cats, communities, and messages are samples. The burn counter is an illustration. Picking a picture, sending it, or minting it walks the steps and then stops. The picture stays on your device. Nothing here creates a wallet, asks for a seed phrase, signs a transaction, or talks to Solana, Dogecoin, or IPFS.
 
+How the live portal will keep messages, profiles, and private notes is written in plain language in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Private messages are not in this demo. When they are added, they will be end-to-end encrypted, the way Sup encrypts to a profile’s public key.
+
 Tagline: **Memes are forever on Doge.**
 
 - Site: [meoweco.in](https://meoweco.in)
@@ -22,7 +24,7 @@ A yellow bar on every screen says **DEMO MODE — no real transactions**. The fo
 - **My store** and **a cat’s storefront** — items that profile minted or holds. Open one. The button says **Trading coming soon**.
 - **Profile** — your picture, your bio, and the communities you own. Choose a profile picture from your device.
 
-There is no global feed.
+There is no global feed. Private messages are not on these screens. They will be end-to-end encrypted. The plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 Deep links use a hash, so they work on GitHub Pages:
 
@@ -95,9 +97,11 @@ These later phases plug in behind the same screens. The buttons and pages stay. 
 2. **Relayer.** Takes the MEOWE fee, burns 30%, swaps 60% toward the Dogecoin record, and sends 10% to community nodes. `submit()` in `src/services/mockRelayer.ts` is the seam. It already accepts a message, a profile picture, a community, and a minted item.
 3. **IPFS pinning.** Real content ids for pictures people upload. `pin()` in `src/services/mockIpfs.ts` is the seam. The demo keeps the file on the device.
 4. **Dogecoin indexer.** Reads Sup-style P2FK records so profiles, items, communities, and messages come from the chain. The read side is `src/services/mockIndexer.ts`, exposed as the indexer, the community service, and the chat service.
-5. **Marketplace trading.** A storefront is a shelf until this phase. The button stays on **Trading coming soon**.
+5. **Marketplace trading.** A purchase is on that profile’s storefront. There is no separate marketplace yet. The button stays on **Trading coming soon**.
+6. **Private messages.** End-to-end encrypted to the recipient profile’s public key (PKX and PKY), following Sup. `encryptFor` and `decrypt` in `src/services/mockEncryption.ts` are the seam. The mock does not encrypt. There is no private-message button in this demo.
+7. **Later ideas, not built.** A paid promotion, with 50% of the fee burned (the rest is still to be decided). An optional “carve it on Doge” upgrade that writes one message fully onto Dogecoin.
 
-`src/services/createServices.ts` is the one place that wires those pieces together. Pages never talk to a chain directly.
+`src/services/createServices.ts` is the one place that wires those pieces together. Pages never talk to a chain directly. The plain-language plan is [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## For a developer
 
@@ -105,6 +109,7 @@ These later phases plug in behind the same screens. The buttons and pages stay. 
 - `src/services/pricing.ts` is the price module: cents in, MEOWE out, then the 30/60/10 split in whole tokens.
 - Sample communities, channels, messages, and items are `src/services/catalog.ts`. Anything you forge in the demo is kept in memory and disappears on refresh.
 - `CommunityService` and `ChatService` are the seams for communities and text chats. A live indexer can replace the mock without redrawing the pages.
+- `EncryptionService` is the seam for end-to-end private messages. The mock is `src/services/mockEncryption.ts`.
 - The coin picture is the Meowecoin logo from meoweco.in. The cats are original drawings for this demo.
 
 Not financial advice. DYOR.

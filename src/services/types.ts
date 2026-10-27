@@ -229,6 +229,23 @@ export interface ChatService {
 }
 
 /**
+ * End-to-end encryption for private messages.
+ * A live service follows Sup: encrypt to the recipient profile's pkx/pky,
+ * and decrypt only with that profile's private key.
+ * The mock does not encrypt and does not hold a private key.
+ */
+export interface EncryptedPayload {
+  ciphertext: string;
+  simulated: true;
+}
+
+export interface EncryptionService {
+  readonly mode: 'mock' | 'sup';
+  encryptFor(pkx: string, pky: string, plaintext: Uint8Array): Promise<EncryptedPayload>;
+  decrypt(ciphertext: string): Promise<Uint8Array | null>;
+}
+
+/**
  * Demo-only write path. A live indexer learns by reading Dogecoin and Solana,
  * so the real one will not implement this. The mock uses it so a forged
  * message can show up in the tour immediately.

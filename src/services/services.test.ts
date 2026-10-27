@@ -83,10 +83,29 @@ describe('demo services', () => {
         localImageUrl: 'blob:http://demo/mint',
         quote: mint,
       });
+      const sealed = await services.encryption.encryptFor('aa', 'bb', new Uint8Array([1, 2, 3]));
+      expect(sealed.simulated).toBe(true);
+      expect(await services.encryption.decrypt(sealed.ciphertext)).toBeNull();
       expect(calls).toBe(0);
     } finally {
       globalThis.fetch = original;
     }
+  });
+
+  it('stubs private-message encryption without keeping the text', async () => {
+    const { encryption } = createMockServices();
+    const plaintext = new TextEncoder().encode('secret hello');
+    const sealed = await encryption.encryptFor(
+      '1464ff8570761789398bdeac42facdfb70f5b565aa665b45642a4277923a0485',
+      '8d1f74f7f2b01db0530b3edbe19afa2d41fb7c52741ce6e7416fcf9ea0c4f07f',
+      plaintext,
+    );
+    expect(encryption.mode).toBe('mock');
+    expect(sealed.simulated).toBe(true);
+    expect(sealed.ciphertext).toBe(`mock:${plaintext.byteLength}`);
+    expect(sealed.ciphertext).not.toContain('secret');
+    expect(await encryption.decrypt(sealed.ciphertext)).toBeNull();
+    await expect(encryption.encryptFor('', 'bb', plaintext)).rejects.toThrow(/pkx/);
   });
 
   it('creates a public label and no secret field', async () => {
