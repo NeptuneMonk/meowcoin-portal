@@ -1,9 +1,13 @@
+import { MockEncryption } from './mockEncryption';
 import { MockIndexer } from './mockIndexer';
 import { MockIpfs } from './mockIpfs';
 import { MockPricing } from './mockPricing';
 import { MockRelayer } from './mockRelayer';
 import { MockWallet } from './mockWallet';
 import type {
+  ChatService,
+  CommunityService,
+  EncryptionService,
   IndexerService,
   IpfsService,
   PricingService,
@@ -22,6 +26,9 @@ export interface PortalServices {
   ipfs: IpfsService;
   relayer: RelayerService;
   indexer: IndexerService;
+  communities: CommunityService;
+  chat: ChatService;
+  encryption: EncryptionService;
 }
 
 export function createMockServices(): PortalServices {
@@ -33,5 +40,8 @@ export function createMockServices(): PortalServices {
     ipfs,
     relayer: new MockRelayer(ipfs, indexer),
     indexer,
+    communities: indexer,
+    chat: indexer,
+    encryption: new MockEncryption(),
   };
 }

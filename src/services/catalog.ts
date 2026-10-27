@@ -1,6 +1,16 @@
-import type { Item, Post, Profile } from './types';
+import { GUEST_LOOK } from '../content/looks';
 import { demoAddress, demoCid, demoTxid } from './ids';
 import { POST_QUOTE } from './pricing';
+import type {
+  Channel,
+  ChatMessage,
+  Community,
+  Item,
+  Membership,
+  Profile,
+} from './types';
+
+export const GUEST_HANDLE = 'you';
 
 const burned = POST_QUOTE.split.burn;
 
@@ -19,6 +29,7 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Life 2',
     walletLabel: demoAddress('profile:ninelives'),
+    localImageUrl: null,
     forgedHere: false,
   },
   {
@@ -35,6 +46,7 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Smithy',
     walletLabel: demoAddress('profile:whiskersmith'),
+    localImageUrl: null,
     forgedHere: false,
   },
   {
@@ -51,6 +63,7 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Scribe',
     walletLabel: demoAddress('profile:pawscript'),
+    localImageUrl: null,
     forgedHere: false,
   },
   {
@@ -67,6 +80,7 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Collector',
     walletLabel: demoAddress('profile:goldnip'),
+    localImageUrl: null,
     forgedHere: false,
   },
   {
@@ -83,96 +97,193 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Node',
     walletLabel: demoAddress('profile:voidnap'),
+    localImageUrl: null,
+    forgedHere: false,
+  },
+  {
+    handle: GUEST_HANDLE,
+    name: 'You',
+    role: 'Guest',
+    bio: 'This is your profile in the demo. Pictures you pick stay on this device.',
+    look: GUEST_LOOK,
+    joinedLabel: 'Just visiting',
+    walletLabel: demoAddress('profile:you'),
+    localImageUrl: null,
     forgedHere: false,
   },
 ];
 
-function post(
+const communities: Community[] = [
+  {
+    id: 'nine-lives',
+    name: 'Nine Lives',
+    topic: 'The second life of the emoji cat.',
+    ownerHandle: 'ninelives',
+    hue: '#d4b235',
+    mark: '9',
+    forgedHere: false,
+  },
+  {
+    id: 'smithy',
+    name: 'The Smithy',
+    topic: 'Where a meme gets hammered into a record.',
+    ownerHandle: 'whiskersmith',
+    hue: '#e8963a',
+    mark: 'S',
+    forgedHere: false,
+  },
+  {
+    id: 'node-night',
+    name: 'Node Night',
+    topic: 'Night shift for pins and the index.',
+    ownerHandle: 'voidnap',
+    hue: '#2ba59a',
+    mark: 'N',
+    forgedHere: false,
+  },
+];
+
+const channels: Channel[] = [
+  {
+    id: 'nine-lives-general',
+    communityId: 'nine-lives',
+    name: 'general',
+    topic: 'The front room.',
+  },
+  {
+    id: 'nine-lives-lore',
+    communityId: 'nine-lives',
+    name: 'lore',
+    topic: 'How the emoji got a second life.',
+  },
+  {
+    id: 'smithy-general',
+    communityId: 'smithy',
+    name: 'general',
+    topic: 'The smithy floor.',
+  },
+  {
+    id: 'smithy-memes',
+    communityId: 'smithy',
+    name: 'memes',
+    topic: 'Pictures worth a penny.',
+  },
+  {
+    id: 'node-night-general',
+    communityId: 'node-night',
+    name: 'general',
+    topic: 'Quiet channel. Still on the clock.',
+  },
+];
+
+const memberships: Membership[] = [
+  'ninelives',
+  'whiskersmith',
+  'pawscript',
+  'goldnip',
+  'voidnap',
+  GUEST_HANDLE,
+].flatMap((handle) => [
+  { communityId: 'nine-lives', handle },
+  { communityId: 'smithy', handle },
+]).concat([
+  { communityId: 'node-night', handle: 'voidnap' },
+  { communityId: 'node-night', handle: 'ninelives' },
+  { communityId: 'node-night', handle: GUEST_HANDLE },
+]);
+
+function message(
   id: string,
+  channelId: string,
   handle: string,
-  kind: Post['kind'],
-  meme: Post['meme'],
   text: string,
   createdLabel: string,
-): Post {
+): ChatMessage {
   return {
     id,
+    channelId,
     handle,
-    kind,
-    meme,
     text,
+    localImageUrl: null,
     createdLabel,
     burned,
-    cid: demoCid(`post:${id}`),
-    dogeTxid: demoTxid(`post:${id}`),
+    cid: demoCid(`msg:${id}`),
+    dogeTxid: demoTxid(`msg:${id}`),
     forgedHere: false,
   };
 }
 
-const posts: Post[] = [
-  post(
-    'p-forever',
+/** Oldest first. New demo messages are appended. */
+const messages: ChatMessage[] = [
+  message(
+    'm-hello',
+    'nine-lives-general',
     'ninelives',
-    'meme',
-    'forever',
     'Memes are forever on Doge. That is the tagline, and it is the job.',
     '2h ago',
   ),
-  post(
-    'p-second',
+  message(
+    'm-second',
+    'nine-lives-general',
     'whiskersmith',
-    'meme',
+    'The first life ended when the deployer left. This room is the second one.',
+    '2h ago',
+  ),
+  message(
+    'm-penny',
+    'nine-lives-general',
+    'pawscript',
+    'A message is about one cent. Part of that cent is burned for good.',
+    '1h ago',
+  ),
+  message(
+    'm-lore',
+    'nine-lives-lore',
     'ninelives',
-    'The first life ended when the deployer left. This one belongs to the community.',
+    'I started as a reaction emoji in the DOGEos Discord. Nine lives. Still here.',
     'Yesterday',
   ),
-  post(
-    'p-pool',
-    'pawscript',
-    'message',
-    null,
-    'Wrapped DOGE sits in the pool. The lasting record is native Dogecoin.',
+  message(
+    'm-pool',
+    'nine-lives-lore',
+    'goldnip',
+    'The pool pairs MEOWE with wrapped DOGE. The lasting record is native Dogecoin.',
+    'Yesterday',
+  ),
+  message(
+    'm-hammer',
+    'smithy-general',
+    'whiskersmith',
+    'Bring a picture from your own camera roll. In this demo it never leaves the phone.',
     '5h ago',
   ),
-  post(
-    'p-penny',
+  message(
+    'm-layers',
+    'smithy-general',
+    'pawscript',
+    'The file is meant for IPFS. A Solana memo carries the content id. The profile and the item are written on Dogecoin.',
+    '4h ago',
+  ),
+  message(
+    'm-stamp',
+    'smithy-memes',
     'goldnip',
-    'meme',
-    'penny',
-    'A post is about one cent. Part of that cent is burned for good.',
+    'I will keep the medallion on my shelf until trading is real.',
     '1d ago',
   ),
-  post(
-    'p-quiet',
+  message(
+    'm-nodes',
+    'node-night-general',
     'voidnap',
-    'message',
-    null,
-    'If this website goes quiet, the meme is still supposed to live in the chain.',
-    '3d ago',
-  ),
-  post(
-    'p-beside',
-    'ninelives',
-    'meme',
-    'beside',
-    'A cat in a Doge world. The pool pairs MEOWE with wrapped DOGE.',
-    '4d ago',
-  ),
-  post(
-    'p-layers',
-    'whiskersmith',
-    'message',
-    null,
-    'The file lives on IPFS. A Solana memo carries the content id. Profiles and items are written on Dogecoin.',
-    '6d ago',
-  ),
-  post(
-    'p-nodes',
-    'voidnap',
-    'message',
-    null,
     'Community nodes pin the files and index Dogecoin. They receive 10% of each fee.',
-    '8d ago',
+    '3h ago',
+  ),
+  message(
+    'm-quiet',
+    'node-night-general',
+    'ninelives',
+    'If this website goes quiet, the message is still supposed to live in the chain.',
+    '1h ago',
   ),
 ];
 
@@ -190,6 +301,7 @@ function item(
     name,
     blurb,
     art,
+    localImageUrl: null,
     creatorHandle,
     ownerHandle,
     previewMeowe,
@@ -199,7 +311,7 @@ function item(
   };
 }
 
-/** Preview prices are illustrations for the grid. They are not buy quotes. */
+/** Preview prices are illustrations for the shelf. They are not buy quotes. */
 const items: Item[] = [
   item(
     'medallion',
@@ -231,7 +343,7 @@ const items: Item[] = [
   item(
     'stamp',
     'Penny Burn Stamp',
-    'Marks a post that burned its 30% share.',
+    'Marks a message that burned its 30% share.',
     'stamp',
     'pawscript',
     'pawscript',
@@ -257,10 +369,22 @@ const items: Item[] = [
   ),
 ];
 
-export function buildCatalog(): { profiles: Profile[]; posts: Post[]; items: Item[] } {
+export interface Catalog {
+  profiles: Profile[];
+  items: Item[];
+  communities: Community[];
+  channels: Channel[];
+  memberships: Membership[];
+  messages: ChatMessage[];
+}
+
+export function buildCatalog(): Catalog {
   return {
     profiles: profiles.map((profile) => ({ ...profile, look: { ...profile.look } })),
-    posts: posts.map((entry) => ({ ...entry })),
     items: items.map((entry) => ({ ...entry })),
+    communities: communities.map((entry) => ({ ...entry })),
+    channels: channels.map((entry) => ({ ...entry })),
+    memberships: memberships.map((entry) => ({ ...entry })),
+    messages: messages.map((entry) => ({ ...entry })),
   };
 }

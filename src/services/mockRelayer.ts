@@ -11,6 +11,7 @@ import type {
  * Stands in for the future relayer.
  * A real relayer would burn MEOWE, swap the DOGE share, and write the record.
  * This one pins a demo content id and tells the in-memory indexer.
+ * It does not upload the picture.
  */
 export class MockRelayer implements RelayerService {
   private seq = 0;
@@ -39,7 +40,8 @@ export class MockRelayer implements RelayerService {
 }
 
 function labelOf(request: ForgeRequest): string {
-  if (request.action === 'post') return request.text.slice(0, 80);
-  if (request.action === 'profile') return request.handle;
+  if (request.action === 'message') return request.text.slice(0, 80) || 'image';
+  if (request.action === 'profile') return 'picture';
+  if (request.action === 'community') return request.name;
   return request.name;
 }

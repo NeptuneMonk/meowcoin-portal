@@ -7,6 +7,7 @@ import {
   LAUNCH_SUPPLY,
   MINT_QUOTE,
   POST_QUOTE,
+  COMMUNITY_QUOTE,
   PROFILE_QUOTE,
   splitMeowe,
 } from './pricing';
@@ -25,6 +26,12 @@ describe('pricing', () => {
     expect(PROFILE_QUOTE.split.burn + PROFILE_QUOTE.split.doge + PROFILE_QUOTE.split.nodes).toBe(
       PROFILE_QUOTE.meowe,
     );
+  });
+
+  it('prices a community the same as a profile picture', () => {
+    expect(COMMUNITY_QUOTE.usdCents).toBe(PROFILE_QUOTE.usdCents);
+    expect(COMMUNITY_QUOTE.meowe).toBe(PROFILE_QUOTE.meowe);
+    expect(COMMUNITY_QUOTE.split.burn).toBe(PROFILE_QUOTE.split.burn);
   });
 
   it('prices an item mint at five cents', () => {

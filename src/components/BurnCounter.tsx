@@ -15,14 +15,15 @@ export function BurnCounter() {
       <p className="burn-num" aria-label={`${formatMeowe(year.burned)} MEOWE`}>
         {formatCompact(shown)}
       </p>
-      <p className="burn-unit">MEOWE in a year, if 1,000 posts happened every day</p>
+      <p className="burn-unit">MEOWE in a year, if 1,000 messages happened every day</p>
       <p>
-        One post in this demo burns <strong>{formatMeowe(year.perPost)} MEOWE</strong>. At 1,000 posts
-        a day that is {formatMillion(year.burned)} a year, about {formatShare(year.share)} of the{' '}
-        {formatMillion(CURRENT_SUPPLY)} still out there. About {formatMillion(year.left)} would be left.
+        One message in this demo burns <strong>{formatMeowe(year.perPost)} MEOWE</strong>. At 1,000
+        messages a day that is {formatMillion(year.burned)} a year, about {formatShare(year.share)} of
+        the {formatMillion(CURRENT_SUPPLY)} still out there. About {formatMillion(year.left)} would be
+        left.
       </p>
       <p className="micro">
-        This counter does not read a chain. Nothing is burned. A post is priced in pennies, so the
+        This counter does not read a chain. Nothing is burned. A message is priced in pennies, so the
         same cent burns fewer tokens if MEOWE is worth more. The burn stays a share of what is left
         and does not run the supply to zero.
       </p>

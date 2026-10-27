@@ -1,73 +1,45 @@
 import { Link, useParams } from 'react-router-dom';
+import { ScreenHead } from '../components/AppShell';
 import { CopyButton } from '../components/CopyButton';
-import { ItemArt } from '../components/ItemArt';
+import { ItemVisual } from '../components/ItemVisual';
 import { formatMeowe, shortHash } from '../format';
-import { useItem, useProfiles } from '../services/hooks';
+import { GUEST_HANDLE } from '../services/catalog';
+import { useItem, useProfile } from '../services/hooks';
 import { usePageTitle } from '../usePageTitle';
+import { NotFound } from './NotFound';
 
 export function ItemPage() {
   const { id } = useParams();
   const item = useItem(id);
-  const profiles = useProfiles();
+  const creator = useProfile(item?.creatorHandle);
+  const owner = useProfile(item?.ownerHandle);
   usePageTitle(item ? `${item.name} — The Forge` : 'Item — The Forge');
+  if (!item) return <NotFound />;
 
-  if (!item) {
-    return (
-      <div className="wrap page">
-        <h1>That item is not in the demo</h1>
-        <Link className="btn btn-primary" to="/market">
-          Back to the marketplace
-        </Link>
-      </div>
-    );
-  }
-
-  const creator = profiles.find((profile) => profile.handle === item.creatorHandle);
-  const owner = profiles.find((profile) => profile.handle === item.ownerHandle);
+  const back =
+    item.ownerHandle === GUEST_HANDLE ? '/store' : `/u/${item.ownerHandle}/store`;
 
   return (
-    <div className="wrap page narrow">
-      <p>
-        <Link to="/market">Back to the marketplace</Link>
-      </p>
-      <article className="item-detail">
-        <ItemArt id={item.art} />
+    <div className="fill pad">
+      <ScreenHead title={item.name} backTo={back} backLabel="Storefront" />
+      <div className="item-detail">
+        <ItemVisual item={item} />
         <div>
-          <p className="kicker">Dogecoin P2FK object</p>
-          <h1>{item.name}</h1>
-          {item.forgedHere ? <p className="ribbon">Forged in this demo</p> : null}
           <p>{item.blurb}</p>
-          <p className="price-xl">
-            {item.previewMeowe === null
-              ? 'Not listed'
-              : `${formatMeowe(item.previewMeowe)} MEOWE`}
+          {item.localImageUrl ? (
+            <p className="micro">Your image stays on your device in demo mode.</p>
+          ) : null}
+          <p>
+            Minted by{' '}
+            {creator ? <Link to={`/u/${creator.handle}`}>{creator.name}</Link> : item.creatorHandle}
+            . Held by{' '}
+            {owner ? <Link to={`/u/${owner.handle}/store`}>{owner.name}</Link> : item.ownerHandle}.
           </p>
-          <p className="micro">
-            {item.previewMeowe === null
-              ? 'Forged in the demo, and not for sale.'
-              : 'Preview price only. You cannot buy this.'}
-          </p>
-          <button type="button" className="btn btn-primary" disabled>
-            Trading coming soon
-          </button>
-          <dl className="facts">
-            <div>
-              <dt>Creator</dt>
-              <dd>{creator ? <Link to={`/profile/${creator.handle}`}>{creator.name}</Link> : 'You'}</dd>
-            </div>
-            <div>
-              <dt>Holder</dt>
-              <dd>{owner ? <Link to={`/profile/${owner.handle}`}>{owner.name}</Link> : 'You'}</dd>
-            </div>
-            <div>
-              <dt>Chain</dt>
-              <dd>Dogecoin</dd>
-            </div>
-            <div>
-              <dt>Format</dt>
-              <dd>Sup-style P2FK</dd>
-            </div>
-          </dl>
+          {item.previewMeowe ? (
+            <p className="micro">Shelf illustration: {formatMeowe(item.previewMeowe)} MEOWE. Not for sale.</p>
+          ) : (
+            <p className="micro">Not listed. Trading is not on.</p>
+          )}
           <div className="badge-row">
             <CopyButton label="IPFS CID" value={item.cid} display={shortHash(item.cid, 10, 6)} />
             <CopyButton
@@ -76,8 +48,11 @@ export function ItemPage() {
               display={shortHash(item.dogeTxid, 8, 4)}
             />
           </div>
+          <button className="btn btn-primary btn-block" type="button" disabled>
+            Trading coming soon
+          </button>
         </div>
-      </article>
+      </div>
     </div>
   );
 }

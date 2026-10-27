@@ -1,8 +1,10 @@
 # The Forge — MEOWE Portal (guest demo)
 
-This is a tour of the MEOWE Portal, nicknamed **the Forge**. It is the app where a person will mint a profile, post a meme, and mint an item, paying only in MEOWE. The file sits on IPFS. A Solana memo carries the content id (a fingerprint of that file). The profile and the item are written on Dogecoin in the Sup style, called P2FK.
+This is a tour of the MEOWE Portal, nicknamed **the Forge**. It is the app where a person will keep a profile, run a community, chat in text channels, and mint items onto a storefront, paying only in MEOWE. A picture they upload is meant for IPFS. A Solana memo carries the content id. The profile, the community, and the item are written on Dogecoin in the Sup style, called P2FK.
 
-**This build is a guest demo.** The cats, posts, and items are samples. The burn counter is an illustration. Try it walks the steps and then stops. Nothing here creates a wallet, asks for a seed phrase, signs a transaction, or talks to Solana, Dogecoin, or IPFS.
+**This build is a guest demo.** The cats, communities, and messages are samples. The burn counter is an illustration. Picking a picture, sending it, or minting it walks the steps and then stops. The picture stays on your device. Nothing here creates a wallet, asks for a seed phrase, signs a transaction, or talks to Solana, Dogecoin, or IPFS.
+
+How the live portal will keep messages, profiles, and private notes is written in plain language in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Private messages are not in this demo. When they are added, they will be end-to-end encrypted, the way Sup encrypts to a profile’s public key.
 
 Tagline: **Memes are forever on Doge.**
 
@@ -15,19 +17,26 @@ A yellow bar on every screen says **DEMO MODE — no real transactions**. The fo
 
 ## What you can click
 
-- **Enter the Forge** — the front page, the simulated burn, the 30/60/10 split, and how a post becomes a record.
-- **Explore** — sample posts. Each one shows MEOWE burned, an IPFS content id, and a Dogecoin record. Those values are fake, and they are labeled as part of the demo.
-- **A cat’s profile** — posts and items for that sample cat. The pictures are drawn cats, not photos of people.
-- **Marketplace** — a grid of sample Dogecoin objects. Trading is not on. The button says **Trading coming soon**.
-- **Try it** — create a profile, post a meme, or mint an item. You see the price in pennies and in MEOWE, the fee split, a short burn animation, and a simulated “record written to Dogecoin” screen. It ends with **This is a demo — coming soon** and links to the site, X, and Telegram.
+- **Enter the Forge** — the front page, the simulated burn, the 30/60/10 split, then the app.
+- **Chats** — conversations you are in. On a phone this is a list. Tap one to open it. On a wide screen the communities sit in a rail, the channels sit beside them, and the chat sits in the middle.
+- **Communities** — a few sample rooms, plus **Create community**. A community has text channels. It can link to the owner’s storefront.
+- **A chat** — messages from the sample cats. Each one cost about a penny. Tap **Burned 374 MEOWE** to see the content id and the Dogecoin record. Those values are simulated. You can type a message or attach a picture from your device.
+- **My store** and **a cat’s storefront** — items that profile minted or holds. Open one. The button says **Trading coming soon**.
+- **Profile** — your picture, your bio, and the communities you own. Choose a profile picture from your device.
+
+There is no global feed. Private messages are not on these screens. They will be end-to-end encrypted. The plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 Deep links use a hash, so they work on GitHub Pages:
 
-- `#/explore`
-- `#/profile/ninelives`
-- `#/market`
-- `#/market/medallion`
-- `#/try/post`
+- `#/chats`
+- `#/communities`
+- `#/c/nine-lives/nine-lives-general`
+- `#/u/ninelives/store`
+- `#/mint`
+
+## Pictures you pick
+
+The profile picture, a picture in a chat, and a store item all use your device’s file picker. The preview is local. The demo says **Your image stays on your device in demo mode.** It is not uploaded and it is not stored on a server. Refreshing the page clears it.
 
 ## Prices in this demo
 
@@ -35,11 +44,12 @@ There is one illustration rate: **one penny buys 1,246 MEOWE**. Every fee uses t
 
 | Action | Price | MEOWE | Burned (30%) |
 | --- | --- | --- | --- |
-| Post | $0.01 | 1,246 | 374 |
+| Chat message | $0.01 | 1,246 | 374 |
 | Mint an item | $0.05 | 6,230 | 1,869 |
-| Profile | $0.15 | 18,690 | 5,607 |
+| Profile picture | $0.15 | 18,690 | 5,607 |
+| Create a community | $0.15 | 18,690 | 5,607 |
 
-A profile at fifteen cents is 18,690 MEOWE at this rate (the public illustration rounds the same idea to about 19,000). The burn story on the front page is the post: 1,000 posts a day burns about 136.5 million MEOWE a year, about 14% of the 960.7 million still out there. Because the fee is a few pennies, the same cent burns fewer tokens if MEOWE is worth more. The counter is labeled **Illustration · not live**.
+A profile picture at fifteen cents is 18,690 MEOWE at this rate (the public illustration rounds the same idea to about 19,000). The burn story on the front page is the message: 1,000 messages a day burns about 136.5 million MEOWE a year, about 14% of the 960.7 million still out there. Because the fee is a few pennies, the same cent burns fewer tokens if MEOWE is worth more. The counter is labeled **Illustration · not live**.
 
 ## Run it on your computer
 
@@ -56,6 +66,8 @@ You need Node.js 20 or newer. If you do not have it, install the LTS version fro
 
 The site is a static build. GitHub publishes it with the workflow in `.github/workflows/pages.yml`. Asset paths are relative, so the pages still load if this repo is renamed later.
 
+The live site updates only when this is merged into `main`. A pull request does not publish.
+
 You only do this once:
 
 1. Open this repo on GitHub.
@@ -69,7 +81,7 @@ The address to share:
 
 **https://neptunemonk.github.io/meowcoin-portal/**
 
-A profile link looks like `https://neptunemonk.github.io/meowcoin-portal/#/profile/ninelives`.
+A community chat looks like `https://neptunemonk.github.io/meowcoin-portal/#/c/nine-lives/nine-lives-general`.
 
 The first publish can take a couple of minutes. If the action fails before the Pages source is set to GitHub Actions, do the Settings step above, then open **Actions** and click **Re-run**.
 
@@ -82,18 +94,22 @@ There are no trackers and no analytics.
 These later phases plug in behind the same screens. The buttons and pages stay. The fake services get replaced.
 
 1. **Wallet creation.** A portal-generated Solana wallet. The screen still never shows a secret key. `createWallet()` in `src/services/mockWallet.ts` is the seam.
-2. **Relayer.** Takes the MEOWE fee, burns 30%, swaps 60% toward the Dogecoin record, and sends 10% to community nodes. `submit()` in `src/services/mockRelayer.ts` is the seam.
-3. **IPFS pinning.** Real content ids for memes and files. `pin()` in `src/services/mockIpfs.ts` is the seam.
-4. **Dogecoin indexer.** Reads Sup-style P2FK records so profiles, items, and holders come from the chain. The read side is `src/services/mockIndexer.ts`.
-5. **Marketplace trading.** The grid is a preview until this phase. Do not enable buying until a real purchase path exists.
+2. **Relayer.** Takes the MEOWE fee, burns 30%, swaps 60% toward the Dogecoin record, and sends 10% to community nodes. `submit()` in `src/services/mockRelayer.ts` is the seam. It already accepts a message, a profile picture, a community, and a minted item.
+3. **IPFS pinning.** Real content ids for pictures people upload. `pin()` in `src/services/mockIpfs.ts` is the seam. The demo keeps the file on the device.
+4. **Dogecoin indexer.** Reads Sup-style P2FK records so profiles, items, communities, and messages come from the chain. The read side is `src/services/mockIndexer.ts`, exposed as the indexer, the community service, and the chat service.
+5. **Marketplace trading.** A purchase is on that profile’s storefront. There is no separate marketplace yet. The button stays on **Trading coming soon**.
+6. **Private messages.** End-to-end encrypted to the recipient profile’s public key (PKX and PKY), following Sup. `encryptFor` and `decrypt` in `src/services/mockEncryption.ts` are the seam. The mock does not encrypt. There is no private-message button in this demo.
+7. **Later ideas, not built.** A paid promotion, with 50% of the fee burned (the rest is still to be decided). An optional “carve it on Doge” upgrade that writes one message fully onto Dogecoin.
 
-`src/services/createServices.ts` is the one place that wires those pieces together. Pages never talk to a chain directly.
+`src/services/createServices.ts` is the one place that wires those pieces together. Pages never talk to a chain directly. The plain-language plan is [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## For a developer
 
-- React, TypeScript, and Vite. Routing is a hash router (`#/explore`), which is what makes deep links work on GitHub Pages without extra server rules.
+- React, TypeScript, and Vite. Routing is a hash router (`#/chats`), which is what makes deep links work on GitHub Pages without extra server rules.
 - `src/services/pricing.ts` is the price module: cents in, MEOWE out, then the 30/60/10 split in whole tokens.
-- The sample feed is `src/services/catalog.ts`. Forged posts from Try it are added in memory and disappear on refresh.
-- The coin picture is the Meowecoin logo from meoweco.in. The feed cats are original drawings for this demo.
+- Sample communities, channels, messages, and items are `src/services/catalog.ts`. Anything you forge in the demo is kept in memory and disappears on refresh.
+- `CommunityService` and `ChatService` are the seams for communities and text chats. A live indexer can replace the mock without redrawing the pages.
+- `EncryptionService` is the seam for end-to-end private messages. The mock is `src/services/mockEncryption.ts`.
+- The coin picture is the Meowecoin logo from meoweco.in. The cats are original drawings for this demo.
 
 Not financial advice. DYOR.
