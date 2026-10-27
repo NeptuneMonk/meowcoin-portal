@@ -5,7 +5,7 @@ import { useServices } from '../services/provider';
 import type { ForgeReceipt, ForgeRequest } from '../services/types';
 
 const PHASES = [
-  'Pinning the file on IPFS',
+  'Pinning on IPFS',
   'Splitting the fee',
   'Burning MEOWE',
   'Writing the Dogecoin record',

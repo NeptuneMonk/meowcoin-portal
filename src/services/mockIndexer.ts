@@ -1,5 +1,6 @@
 import { buildCatalog, GUEST_HANDLE } from './catalog';
 import { slugHandle } from './ids';
+import { itemFromMint } from './objects';
 import type {
   ChainReceipt,
   Channel,
@@ -129,19 +130,12 @@ export class MockIndexer implements IndexerService, CommunityService, ChatServic
       return { id: community.id, handle: GUEST_HANDLE };
     }
 
-    const minted: Item = {
-      id: `forged-item-${n}`,
-      name: request.name.trim(),
-      blurb: request.blurb.trim() || 'Minted in this demo.',
-      art: null,
-      localImageUrl: request.localImageUrl,
-      creatorHandle: GUEST_HANDLE,
-      ownerHandle: GUEST_HANDLE,
-      previewMeowe: null,
-      cid: receipt.cid,
-      dogeTxid: receipt.dogeTxid,
-      forgedHere: true,
-    };
+    const minted: Item = itemFromMint(
+      `forged-item-${n}`,
+      request,
+      receipt.cid,
+      receipt.dogeTxid,
+    );
     this.items = [minted, ...this.items];
     this.emit();
     return { id: minted.id, handle: GUEST_HANDLE };

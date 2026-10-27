@@ -1,4 +1,5 @@
 import { GUEST_LOOK } from '../content/looks';
+import { demoMedia } from './demoMedia';
 import { demoAddress, demoCid, demoTxid } from './ids';
 import { POST_QUOTE } from './pricing';
 import type {
@@ -7,6 +8,7 @@ import type {
   Community,
   Item,
   Membership,
+  ObjectFile,
   Profile,
 } from './types';
 
@@ -308,6 +310,76 @@ function item(
     cid: demoCid(`item:${id}`),
     dogeTxid: demoTxid(`item:${id}`),
     forgedHere: false,
+    urn: id,
+    uri: null,
+    img: null,
+    attributes: {},
+    license: null,
+    max: 1,
+    qty: 1,
+    creators: [creatorHandle],
+    royalties: {},
+    mintedLabel: 'Sample',
+    kind: 'image',
+    files: [],
+    mainFileName: '',
+  };
+}
+
+function bundledFile(
+  itemId: string,
+  name: string,
+  mime: string,
+  size: number,
+  localUrl: string,
+  text: string | null = null,
+): ObjectFile {
+  return {
+    name,
+    mime,
+    size,
+    cid: demoCid(`item:${itemId}:${name}`),
+    localUrl,
+    text,
+  };
+}
+
+function objectItem(
+  id: string,
+  name: string,
+  blurb: string,
+  creatorHandle: string,
+  ownerHandle: string,
+  extra: Pick<
+    Item,
+    | 'kind'
+    | 'files'
+    | 'mainFileName'
+    | 'urn'
+    | 'img'
+    | 'attributes'
+    | 'license'
+    | 'max'
+    | 'royalties'
+    | 'creators'
+    | 'mintedLabel'
+  >,
+): Item {
+  return {
+    id,
+    name,
+    blurb,
+    art: null,
+    localImageUrl: null,
+    creatorHandle,
+    ownerHandle,
+    previewMeowe: null,
+    cid: demoCid(`item:${id}`),
+    dogeTxid: demoTxid(`item:${id}`),
+    forgedHere: false,
+    uri: null,
+    qty: 1,
+    ...extra,
   };
 }
 
@@ -366,6 +438,137 @@ const items: Item[] = [
     'goldnip',
     'goldnip',
     90_000,
+  ),
+  objectItem(
+    'sunbeam',
+    'Sunbeam Pair',
+    'Two drawings of a cat, day and night. Open either one.',
+    'ninelives',
+    'ninelives',
+    {
+      kind: 'image',
+      mainFileName: 'sunbeam.svg',
+      files: [
+        bundledFile('sunbeam', 'sunbeam.svg', 'image/svg+xml', 668, demoMedia.sunbeamUrl),
+        bundledFile('sunbeam', 'moon.svg', 'image/svg+xml', 663, demoMedia.moonUrl),
+      ],
+      urn: `IPFS:${demoCid('item:sunbeam:sunbeam.svg')}/sunbeam.svg`,
+      img: `IPFS:${demoCid('item:sunbeam:sunbeam.svg')}/sunbeam.svg`,
+      attributes: { mood: 'bright' },
+      license: null,
+      max: 1,
+      royalties: {},
+      creators: ['ninelives'],
+      mintedLabel: 'Mar 2024',
+    },
+  ),
+  objectItem(
+    'purr-loop',
+    'Purr Loop',
+    'A one-second color loop, drawn for this demo.',
+    'whiskersmith',
+    'ninelives',
+    {
+      kind: 'video',
+      mainFileName: 'purr.mp4',
+      files: [bundledFile('purr-loop', 'purr.mp4', 'video/mp4', 3868, demoMedia.purrUrl)],
+      urn: `IPFS:${demoCid('item:purr-loop:purr.mp4')}/purr.mp4`,
+      img: null,
+      attributes: {},
+      license: null,
+      max: 8,
+      royalties: {},
+      creators: ['whiskersmith'],
+      mintedLabel: 'Apr 2024',
+    },
+  ),
+  objectItem(
+    'night-meow',
+    'Night Meow',
+    'A short tone, not a song. Two notes, then it stops.',
+    'pawscript',
+    'ninelives',
+    {
+      kind: 'audio',
+      mainFileName: 'night-meow.wav',
+      files: [bundledFile('night-meow', 'night-meow.wav', 'audio/wav', 3644, demoMedia.meowUrl)],
+      urn: `IPFS:${demoCid('item:night-meow:night-meow.wav')}/night-meow.wav`,
+      img: null,
+      attributes: {},
+      license: null,
+      max: 1,
+      royalties: {},
+      creators: ['pawscript'],
+      mintedLabel: 'May 2024',
+    },
+  ),
+  objectItem(
+    'field-guide',
+    'Nine Lives Field Guide',
+    'A one-page book, plus a cover drawing.',
+    'goldnip',
+    'ninelives',
+    {
+      kind: 'pdf',
+      mainFileName: 'field-guide.pdf',
+      files: [
+        bundledFile('field-guide', 'field-guide.pdf', 'application/pdf', 807, demoMedia.guideUrl),
+        bundledFile('field-guide', 'guide-cover.svg', 'image/svg+xml', 667, demoMedia.coverUrl),
+      ],
+      urn: `IPFS:${demoCid('item:field-guide:field-guide.pdf')}/field-guide.pdf`,
+      img: `IPFS:${demoCid('item:field-guide:guide-cover.svg')}/guide-cover.svg`,
+      attributes: { pages: '1' },
+      license: 'CC0',
+      max: 100,
+      royalties: { pawscript: 5 },
+      creators: ['goldnip'],
+      mintedLabel: 'Jun 2024',
+    },
+  ),
+  objectItem(
+    'cat-clicker',
+    'Cat Clicker',
+    'A tiny game. Tap the cat. The score stays in the page.',
+    'voidnap',
+    'ninelives',
+    {
+      kind: 'app',
+      mainFileName: 'index.html',
+      files: [
+        bundledFile(
+          'cat-clicker',
+          'index.html',
+          'text/html',
+          new TextEncoder().encode(demoMedia.indexHtml).length,
+          demoMedia.indexUrl,
+          demoMedia.indexHtml,
+        ),
+        bundledFile(
+          'cat-clicker',
+          'game.js',
+          'text/javascript',
+          new TextEncoder().encode(demoMedia.gameJs).length,
+          demoMedia.gameUrl,
+          demoMedia.gameJs,
+        ),
+        bundledFile(
+          'cat-clicker',
+          'style.css',
+          'text/css',
+          new TextEncoder().encode(demoMedia.styleCss).length,
+          demoMedia.styleUrl,
+          demoMedia.styleCss,
+        ),
+      ],
+      urn: `IPFS:${demoCid('item:cat-clicker:index.html')}/index.html`,
+      img: null,
+      attributes: {},
+      license: null,
+      max: 1,
+      royalties: {},
+      creators: ['voidnap', 'whiskersmith'],
+      mintedLabel: 'Jul 2024',
+    },
   ),
 ];
 

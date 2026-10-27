@@ -33,12 +33,24 @@ describe('demo services', () => {
       expect(channelIds.has(message.channelId)).toBe(true);
       expect(handles.has(message.handle)).toBe(true);
     }
+    const kinds = new Set<string>();
     for (const item of indexer.getItemsSnapshot()) {
       expect(item.cid).toMatch(CID);
       expect(item.localImageUrl).toBeNull();
       expect(handles.has(item.creatorHandle)).toBe(true);
       expect(handles.has(item.ownerHandle)).toBe(true);
+      kinds.add(item.kind);
+      expect(item.creators.length).toBeGreaterThan(0);
+      for (const file of item.files) {
+        expect(file.cid).toMatch(CID);
+        expect(file.size).toBeGreaterThan(0);
+        expect(file.localUrl).toBeTruthy();
+      }
+      if (item.files.length > 0) {
+        expect(item.files.some((file) => file.name === item.mainFileName)).toBe(true);
+      }
     }
+    expect(kinds).toEqual(new Set(['image', 'video', 'audio', 'pdf', 'app']));
     for (const community of indexer.getCommunitiesSnapshot()) {
       expect(
         indexer
@@ -80,7 +92,22 @@ describe('demo services', () => {
         action: 'mint',
         name: 'Offline stamp',
         blurb: 'Stays in the browser.',
-        localImageUrl: 'blob:http://demo/mint',
+        urn: '',
+        uri: null,
+        license: null,
+        max: 1,
+        attributes: {},
+        royaltyPercent: null,
+        mainFileName: 'note.pdf',
+        files: [
+          {
+            name: 'note.pdf',
+            mime: 'application/pdf',
+            size: 4,
+            localUrl: 'blob:http://demo/mint',
+            text: null,
+          },
+        ],
         quote: mint,
       });
       const sealed = await services.encryption.encryptFor('aa', 'bb', new Uint8Array([1, 2, 3]));
@@ -181,11 +208,41 @@ describe('demo services', () => {
       action: 'mint',
       name: 'Pocket coin',
       blurb: 'Picked on this device.',
-      localImageUrl: 'blob:http://demo/item',
+      urn: '',
+      uri: null,
+      license: 'CC0',
+      max: 3,
+      attributes: { metal: 'gold' },
+      royaltyPercent: 5,
+      mainFileName: 'coin.svg',
+      files: [
+        {
+          name: 'coin.svg',
+          mime: 'image/svg+xml',
+          size: 12,
+          localUrl: 'blob:http://demo/item',
+          text: null,
+        },
+        {
+          name: 'note.txt',
+          mime: 'text/plain',
+          size: 4,
+          localUrl: 'blob:http://demo/note',
+          text: null,
+        },
+      ],
       quote: mintQuote,
     });
     const item = services.indexer.getItemsSnapshot().find((entry) => entry.id === minted.entityId);
     expect(item?.localImageUrl).toBe('blob:http://demo/item');
+    expect(item?.kind).toBe('image');
+    expect(item?.files).toHaveLength(2);
+    expect(item?.mainFileName).toBe('coin.svg');
+    expect(item?.urn).toContain('coin.svg');
+    expect(item?.attributes.metal).toBe('gold');
+    expect(item?.royalties.you).toBe(5);
+    expect(item?.license).toBe('CC0');
+    expect(item?.max).toBe(3);
     expect(item?.art).toBeNull();
     expect(item?.ownerHandle).toBe(GUEST_HANDLE);
   });

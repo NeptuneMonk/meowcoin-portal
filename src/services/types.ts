@@ -70,12 +70,38 @@ export interface Profile {
   forgedHere: boolean;
 }
 
+/**
+ * What the viewer should open first.
+ * `app` is an HTML bundle (an index.html plus its files).
+ * `file` is anything else, offered as a download.
+ */
+export type ObjectKind = 'image' | 'video' | 'audio' | 'pdf' | 'app' | 'file';
+
+/**
+ * One file on an object.
+ * Sup does not put this list inside the OBJ JSON. A root record's File map
+ * is name to byte size, and urn / img / uri point at a file.
+ * This list is the demo's copy of that, with a MIME type and a CID placeholder.
+ */
+export interface ObjectFile {
+  name: string;
+  mime: string;
+  size: number;
+  cid: string;
+  /** Object URL or a bundled demo asset. Never an upload. */
+  localUrl: string | null;
+  /** HTML, CSS, or JS kept in memory so a sandboxed launch can inline it. */
+  text: string | null;
+}
+
 export interface Item {
   id: string;
+  /** Sup `nme`. */
   name: string;
+  /** Sup `dsc`. */
   blurb: string;
   art: ItemArtId | null;
-  /** Object URL for an image picked on this device. Never a remote address. */
+  /** Object URL when the main file is an image picked on this device. */
   localImageUrl: string | null;
   creatorHandle: string;
   ownerHandle: string;
@@ -84,6 +110,29 @@ export interface Item {
   cid: string;
   dogeTxid: string;
   forgedHere: boolean;
+  /** Sup `urn`. */
+  urn: string;
+  /** Sup `uri`. */
+  uri: string | null;
+  /** Sup `img`. */
+  img: string | null;
+  /** Sup `atr`. */
+  attributes: Readonly<Record<string, string>>;
+  /** Sup `lic`. */
+  license: string | null;
+  /** Sup `max`. Zero means the sample did not set a maximum. */
+  max: number;
+  /** Units held by `ownerHandle`. Sup stores this in `own`. */
+  qty: number;
+  /** Sup `cre`, as profile handles in this demo. */
+  creators: readonly string[];
+  /** Sup `roy`: handle to a percent. */
+  royalties: Readonly<Record<string, number>>;
+  mintedLabel: string;
+  kind: ObjectKind;
+  files: readonly ObjectFile[];
+  /** File the viewer opens first. Sup's urn is the main reference. */
+  mainFileName: string;
 }
 
 export interface Community {
@@ -139,7 +188,20 @@ export type ForgeRequest =
       action: 'mint';
       name: string;
       blurb: string;
-      localImageUrl: string;
+      urn: string;
+      uri: string | null;
+      license: string | null;
+      max: number;
+      attributes: Readonly<Record<string, string>>;
+      royaltyPercent: number | null;
+      mainFileName: string;
+      files: readonly {
+        name: string;
+        mime: string;
+        size: number;
+        localUrl: string;
+        text: string | null;
+      }[];
       quote: FeeQuote;
     }
   | {
