@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A gold cat face in a sun">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A cat face in a sun">
   <rect width="240" height="240" fill="#1a1406"/>
-  <circle cx="120" cy="120" r="92" fill="#d4b235"/>
-  <circle cx="120" cy="128" r="62" fill="#f6edd4"/>
-  <polygon points="58,78 78,28 108,70" fill="#e2c25a"/>
-  <polygon points="182,78 162,28 132,70" fill="#e2c25a"/>
+  <circle cx="120" cy="120" r="92" fill="#8b5cf6"/>
+  <circle cx="120" cy="128" r="62" fill="#ece9fe"/>
+  <polygon points="58,78 78,28 108,70" fill="#a78bfa"/>
+  <polygon points="182,78 162,28 132,70" fill="#a78bfa"/>
   <ellipse cx="98" cy="124" rx="8" ry="10" fill="#1a1406"/>
   <ellipse cx="142" cy="124" rx="8" ry="10" fill="#1a1406"/>
   <path d="M108 146 Q120 158 132 146" fill="none" stroke="#1a1406" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="120" cy="138" r="4" fill="#e8963a"/>
+  <circle cx="120" cy="138" r="4" fill="#6d28d9"/>
 </svg>

@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
-import coin from '../assets/coin.webp';
 import { BurnCounter } from '../components/BurnCounter';
 import { FeeSplit } from '../components/FeeSplit';
-import { formatMeowe, formatUsd } from '../format';
+import { Icon } from '../components/Icons';
+import { SITE } from '../content/site';
+import { formatMeowe, formatUsd, shortHash } from '../format';
+import { CopyButton } from '../components/CopyButton';
 import {
   COMMUNITY_QUOTE,
   MESSAGE_QUOTE,
@@ -14,12 +16,12 @@ import { usePageTitle } from '../usePageTitle';
 
 const STEPS = [
   {
-    title: 'Open a community',
-    body: 'A profile can run its own community, with text channels for the people in it.',
+    title: 'Mint a Space',
+    body: 'A Space is an on-chain object on Dogecoin (P2FK). You own it, and you can give or transfer it like any other object.',
   },
   {
     title: 'A message is a penny',
-    body: 'Sending a message costs about one cent in MEOWE. You can attach a picture from your device.',
+    body: 'Sending a message in a Space costs about one cent in MEOWE. You can attach a picture from your device.',
   },
   {
     title: 'Split the fee',
@@ -27,7 +29,7 @@ const STEPS = [
   },
   {
     title: 'Keep a storefront',
-    body: 'Each profile has a shelf of items that cat minted. Trading comes later.',
+    body: 'Each profile has its own shelf. There is no global marketplace yet. Trading comes later.',
   },
 ];
 
@@ -35,99 +37,119 @@ const PRICES = [
   { quote: MESSAGE_QUOTE, label: 'A chat message' },
   { quote: MINT_QUOTE, label: 'Mint an item' },
   { quote: PROFILE_QUOTE, label: 'Profile picture' },
-  { quote: COMMUNITY_QUOTE, label: 'A community' },
+  { quote: COMMUNITY_QUOTE, label: 'A Space (illustration)' },
 ];
 
 export function Landing() {
   usePageTitle('The Forge — MEOWE Portal');
 
   return (
-    <div className="wrap landing">
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="kicker">Guest demo</p>
-          <h1>
-            Enter <span className="grad">the Forge</span>
-          </h1>
-          <p className="tagline">Memes are forever on Doge.</p>
-          <p className="lead">
-            Communities, chats, and a storefront on every profile. A message is about one cent of
-            MEOWE and leaves a record on Dogecoin. This is a tour. Nothing here is live.
-          </p>
-          <div className="btn-row">
-            <Link className="btn btn-primary" to="/chats">
-              Enter the Forge
-            </Link>
-            <Link className="btn btn-ghost" to="/communities">
-              See communities
-            </Link>
-          </div>
-          <p className="micro">No wallet. No seed phrase. No payment.</p>
-        </div>
-        <div className="hero-art">
-          <div className="coin-orbit">
-            <img src={coin} width={480} height={480} alt="Meowecoin coin, a gold cat in shades" />
-          </div>
-        </div>
-      </section>
-
-      <section className="card demo-card" aria-labelledby="demo-heading">
-        <h2 id="demo-heading">You are in demo mode</h2>
-        <ul>
-          <li>Nothing on this page touches Solana, Dogecoin, IPFS, or a wallet.</li>
-          <li>The cats, communities, and messages are samples drawn for the tour.</li>
-          <li>A picture you pick stays on this device. It is not uploaded.</li>
-          <li>There is no seed phrase. If a site asks for one, it is not this demo.</li>
-        </ul>
-      </section>
-
-      <div className="econ">
-        <BurnCounter />
-        <FeeSplit quote={POST_QUOTE} heading={`On one message · ${formatUsd(POST_QUOTE.usd)}`} />
+    <div className="fill">
+      <div className="main-h">
+        <Link className="tool" to="/chats" aria-label="Back to messages">
+          <Icon name="back" />
+        </Link>
+        <h1 className="t">The Forge</h1>
       </div>
-
-      <section className="section" aria-labelledby="how-heading">
-        <h2 id="how-heading">How it works</h2>
-        <p className="section-lead">
-          The same screens will run the live portal. Today every result is simulated.
+      <div className="pad page-narrow">
+        <p className="kicker">Guest demo</p>
+        <div className="about-hero">
+          <h1>Memes are forever on Doge.</h1>
+        </div>
+        <p>
+          Spaces, messages, and a storefront on every profile. This is a tour. Nothing here is live,
+          and nothing is minted.
         </p>
-        <ol className="steps">
-          {STEPS.map((step) => (
-            <li key={step.title}>
-              <div>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="section" aria-labelledby="price-heading">
-        <h2 id="price-heading">Prices in pennies</h2>
-        <ul className="price-grid">
-          {PRICES.map(({ quote, label }) => (
-            <li key={label} className="card">
-              <p className="kicker">{label}</p>
-              <p className="price-xl">{formatUsd(quote.usd)}</p>
-              <p>{formatMeowe(quote.meowe)} MEOWE</p>
-              <p className="micro">Burns {formatMeowe(quote.split.burn)} MEOWE</p>
-            </li>
-          ))}
-        </ul>
-        <p className="micro">
-          One demo rate covers every price: one penny is {formatMeowe(POST_QUOTE.meowe)} MEOWE. You
-          only pay in MEOWE.
-        </p>
+        <p className="chip">DEMO MODE — no real transactions</p>
         <div className="btn-row">
-          <Link className="btn btn-primary" to="/chats">
-            Enter the Forge
+          <Link className="btn" to="/chats">
+            Open messages
           </Link>
-          <Link className="btn btn-ghost" to="/mint">
-            Mint an item
+          <Link className="btn sec" to="/c/nine-lives">
+            Nine Lives
           </Link>
         </div>
-      </section>
+        <p className="micro">No wallet. No seed phrase. No payment.</p>
+
+        <section className="card" aria-labelledby="demo-heading">
+          <h2 id="demo-heading">You are in demo mode</h2>
+          <ul>
+            <li>Nothing on this page touches Solana, Dogecoin, IPFS, or a wallet.</li>
+            <li>The cats, Spaces, and messages are samples drawn for the tour.</li>
+            <li>A picture you pick stays on this device. It is not uploaded.</li>
+            <li>There is no seed phrase. If a site asks for one, it is not this demo.</li>
+            <li>
+              Private messages will be end-to-end encrypted, following Sup’s PKX and PKY. The
+              Messages screen is a sample. Nothing is sent.
+            </li>
+          </ul>
+        </section>
+
+        <div className="econ">
+          <BurnCounter />
+          <FeeSplit quote={POST_QUOTE} heading={`On one message · ${formatUsd(POST_QUOTE.usd)}`} />
+        </div>
+
+        <section className="section" aria-labelledby="how-heading">
+          <h2 id="how-heading">How it works</h2>
+          <p className="micro">The same screens will run the live portal. Today every result is simulated.</p>
+          <ol className="steps">
+            {STEPS.map((step) => (
+              <li key={step.title}>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="section" aria-labelledby="price-heading">
+          <h2 id="price-heading">Illustration rates</h2>
+          <p className="micro">
+            These are the portal’s illustration rates. Minting a Space in this demo shows — MEOWE,
+            because nothing is minted.
+          </p>
+          <ul className="price-grid">
+            {PRICES.map(({ quote, label }) => (
+              <li key={label} className="card">
+                <p className="kicker">{label}</p>
+                <p className="price-xl">{formatUsd(quote.usd)}</p>
+                <p>{formatMeowe(quote.meowe)} MEOWE</p>
+                <p className="micro">Burns {formatMeowe(quote.split.burn)} MEOWE</p>
+              </li>
+            ))}
+          </ul>
+          <p className="micro">
+            One demo rate covers every illustrated price: one penny is {formatMeowe(POST_QUOTE.meowe)}{' '}
+            MEOWE. You only pay in MEOWE.
+          </p>
+        </section>
+
+        <footer className="card">
+          <p className="kicker">Links</p>
+          <ul className="footer-links">
+            <li>
+              <a href={SITE.website} target="_blank" rel="noopener noreferrer">
+                meoweco.in
+              </a>
+            </li>
+            <li>
+              <a href={SITE.x} target="_blank" rel="noopener noreferrer">
+                X {SITE.xHandle}
+              </a>
+            </li>
+            <li>
+              <a href={SITE.telegram} target="_blank" rel="noopener noreferrer">
+                Telegram
+              </a>
+            </li>
+          </ul>
+          <CopyButton label="Solana CA" value={SITE.ca} display={shortHash(SITE.ca, 6, 4)} />
+          <p className="disclaimer">Not financial advice. DYOR.</p>
+        </footer>
+      </div>
     </div>
   );
 }

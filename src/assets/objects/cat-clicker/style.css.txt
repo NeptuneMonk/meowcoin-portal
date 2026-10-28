@@ -2,8 +2,8 @@ html, body { margin: 0; height: 100%; }
 body {
   display: grid;
   place-items: center;
-  background: #1a1406;
-  color: #f6edd4;
+  background: #1e1f22;
+  color: #dbdee1;
   font: 18px ui-rounded, "Segoe UI", sans-serif;
 }
 main { text-align: center; }
@@ -13,10 +13,10 @@ main { text-align: center; }
   height: 140px;
   border: 0;
   border-radius: 70px;
-  background: #e2c25a;
-  color: #1a1406;
+  background: #5865f2;
+  color: #fff;
   font-weight: 800;
   font-size: 1.2rem;
   cursor: pointer;
 }
-#cat:active { background: #f0d36a; }
+#cat:active { background: #4752c4; }

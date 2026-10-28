@@ -67,8 +67,8 @@ export function CatAvatar({
         />
         {look.accessory === 'shades' ? (
           <g>
-            <rect x="18" y="39" width="18" height="12" rx="4" fill="#14110c" stroke="#f0d36a" strokeWidth="1.6" />
-            <rect x="44" y="39" width="18" height="12" rx="4" fill="#14110c" stroke="#f0d36a" strokeWidth="1.6" />
+            <rect x="18" y="39" width="18" height="12" rx="4" fill="#14110c" stroke="#c9cdfb" strokeWidth="1.6" />
+            <rect x="44" y="39" width="18" height="12" rx="4" fill="#14110c" stroke="#c9cdfb" strokeWidth="1.6" />
             <path d="M36 45 H44" stroke="#14110c" strokeWidth="2.4" />
           </g>
         ) : null}
@@ -88,8 +88,8 @@ export function CatAvatar({
         {look.accessory === 'crown' ? (
           <path
             d="M16 36 L24 18 L32 30 L40 12 L48 30 L56 18 L64 36 Z"
-            fill="#f0d36a"
-            stroke="#8a6a12"
+            fill="#c9cdfb"
+            stroke="#3b2f73"
             strokeWidth="1.4"
             strokeLinejoin="round"
           />

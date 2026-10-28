@@ -8,11 +8,11 @@ A longer version of the same idea, with the Sup files named, is at the bottom. Y
 
 There are two kinds of things.
 
-**Open community chat.** A message in a public channel costs about one penny, paid in MEOWE. The fee splits the same way as the rest of the portal: 30% is burned, 60% is swapped to DOGE to pay for the Dogecoin record, and 10% goes to community nodes. The words and any picture are the content. That content is pinned on IPFS, which gives it a content id (a CID). A short note on Solana, called a memo, is a small piece of JSON. Its job is to point at that content id. The memo is not the whole message.
+**Open Space chat.** A message in a public channel costs about one penny, paid in MEOWE. The fee splits the same way as the rest of the portal: 30% is burned, 60% is swapped to DOGE to pay for the Dogecoin record, and 10% goes to community nodes. The words and any picture are the content. That content is pinned on IPFS, which gives it a content id (a CID). A short note on Solana, called a memo, is a small piece of JSON. Its job is to point at that content id. The memo is not the whole message.
 
 One message on its own is not also copied onto Dogecoin. Once a day, the portal writes **one** Dogecoin record for that day. Inside it is a Merkle root: a short fingerprint of every open message from that day. Anyone who still has a message can check it against that fingerprint and show that the message existed that day and was not changed later. The exact hash used to build the fingerprint is still to be confirmed.
 
-**Things a profile owns.** A profile and a storefront item are Dogecoin objects in the Sup style, called P2FK (pay to a future key). The files themselves sit on IPFS. The Dogecoin record is what says who owns the object. We pin every file on our own IPFS node (Kubo), and we also use public pinning services so a file is not kept in only one place. We run our own Dogecoin indexer, which is the reader that turns those records back into profiles, items, communities, and messages. A store item can hold more than one file. The fields are in the Objects section below.
+**Things a profile owns.** A profile and a storefront item are Dogecoin objects in the Sup style, called P2FK (pay to a future key). The files themselves sit on IPFS. The Dogecoin record is what says who owns the object. We pin every file on our own IPFS node (Kubo), and we also use public pinning services so a file is not kept in only one place. We run our own Dogecoin indexer, which is the reader that turns those records back into profiles, items, Spaces, and messages. A store item can hold more than one file. The fields are in the Objects section below.
 
 ## Objects
 
@@ -49,7 +49,7 @@ The demo’s `files` list is our stand-in for that root `File` map, plus a MIME 
 
 ## 2. Private messages
 
-Private messages are not in the demo, and there is no button for them yet. When they are built, they will be end-to-end encrypted, following Sup.
+The Messages screen in this demo is a sample thread. Nothing on it is encrypted, and nothing is sent. When private messages are built for real, they will be end-to-end encrypted, following Sup.
 
 End-to-end means the portal encrypts the message for the recipient before it is uploaded. The servers, the IPFS pin, and the Solana memo do not get a readable copy. Only the recipient’s key can decrypt the stored message.
 
