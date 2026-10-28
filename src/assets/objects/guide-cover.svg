@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Cover of a small field guide">
-  <rect width="240" height="240" fill="#2a2112"/>
-  <rect x="36" y="28" width="168" height="184" rx="8" fill="#f6edd4"/>
-  <rect x="52" y="48" width="136" height="12" fill="#d4b235"/>
+  <rect width="240" height="240" fill="#1e1f22"/>
+  <rect x="36" y="28" width="168" height="184" rx="8" fill="#e8eaef"/>
+  <rect x="52" y="48" width="136" height="12" fill="#5865f2"/>
   <rect x="52" y="72" width="100" height="8" fill="#1a1406"/>
-  <rect x="52" y="90" width="120" height="6" fill="#cbbd9a"/>
-  <rect x="52" y="104" width="110" height="6" fill="#cbbd9a"/>
-  <circle cx="120" cy="156" r="28" fill="#e2c25a"/>
-  <polygon points="96,150 106,118 124,146" fill="#c4962a"/>
-  <polygon points="144,150 134,118 116,146" fill="#c4962a"/>
+  <rect x="52" y="90" width="120" height="6" fill="#949ba4"/>
+  <rect x="52" y="104" width="110" height="6" fill="#949ba4"/>
+  <circle cx="120" cy="156" r="28" fill="#8b5cf6"/>
+  <polygon points="96,150 106,118 124,146" fill="#6d4bd8"/>
+  <polygon points="144,150 134,118 116,146" fill="#6d4bd8"/>
 </svg>

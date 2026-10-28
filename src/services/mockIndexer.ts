@@ -17,7 +17,7 @@ import type {
   Profile,
 } from './types';
 
-const HUES = ['#d4b235', '#e8963a', '#2ba59a', '#e77fa8', '#8b5cf6'];
+const HUES = ['#5865f2', '#6d4bd8', '#3a3c43', '#16655e', '#e0528a'];
 
 export class MockIndexer implements IndexerService, CommunityService, ChatService, DemoForgeSink {
   private profiles: readonly Profile[];

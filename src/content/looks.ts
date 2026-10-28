@@ -1,18 +1,18 @@
 import type { Accessory, CatLook } from '../services/types';
 
 export const GUEST_LOOK: CatLook = {
-  fur: '#e7b3c7',
-  belly: '#fff0f6',
-  accent: '#f0d36a',
-  accessory: 'crown',
+  fur: '#4e5058',
+  belly: '#dbdee1',
+  accent: '#6d6f78',
+  accessory: 'none',
   mood: 'smile',
 };
 
 export const FUR_CHOICES = [
-  { id: 'gold', label: 'Gold', fur: '#e2c25a', belly: '#fff4c8' },
-  { id: 'ginger', label: 'Ginger', fur: '#e8963a', belly: '#ffe0c2' },
-  { id: 'cream', label: 'Cream', fur: '#f6edd4', belly: '#fffaf0' },
-  { id: 'void', label: 'Void', fur: '#3f3a34', belly: '#d9cbb3' },
+  { id: 'slate', label: 'Slate', fur: '#4e5058', belly: '#dbdee1' },
+  { id: 'violet', label: 'Violet', fur: '#8b5cf6', belly: '#ece9fe' },
+  { id: 'cream', label: 'Mist', fur: '#c9cdd4', belly: '#f2f3f5' },
+  { id: 'void', label: 'Void', fur: '#2b2d31', belly: '#b5bac1' },
 ] as const;
 
 export const ACCESSORIES: { id: Accessory; label: string }[] = [
@@ -26,7 +26,7 @@ export const ACCESSORIES: { id: Accessory; label: string }[] = [
 export function lookFrom(furId: string, accessory: Accessory): CatLook {
   const fur = FUR_CHOICES.find((choice) => choice.id === furId) ?? FUR_CHOICES[0];
   const accent =
-    accessory === 'beanie' ? '#2ba59a' : accessory === 'cap' ? '#8b5cf6' : '#f0d36a';
+    accessory === 'beanie' ? '#1fa595' : accessory === 'cap' ? '#8b5cf6' : '#5865f2';
   return {
     fur: fur.fur,
     belly: fur.belly,

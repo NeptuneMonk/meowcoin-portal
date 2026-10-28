@@ -271,7 +271,7 @@ export interface IndexerService {
 }
 
 /**
- * Communities ("servers") and their text channels.
+ * Spaces and their text channels. The service name stays CommunityService.
  * A live indexer fills this from Dogecoin records. The mock keeps a snapshot.
  */
 export interface CommunityService {

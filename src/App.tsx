@@ -6,8 +6,10 @@ import { CommunitiesPage } from './pages/CommunitiesPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { ChatsPage } from './pages/ChatsPage';
 import { CreateCommunity } from './pages/CreateCommunity';
+import { FriendsPage } from './pages/FriendsPage';
 import { ItemPage } from './pages/ItemPage';
 import { Landing } from './pages/Landing';
+import { MarketPage } from './pages/MarketPage';
 import { MePage } from './pages/MePage';
 import { MintPage } from './pages/MintPage';
 import { NotFound } from './pages/NotFound';
@@ -21,9 +23,13 @@ export function App() {
       <HashRouter>
         <Routes>
           <Route element={<Layout />}>
-            <Route index element={<Landing />} />
             <Route element={<AppShell />}>
+              <Route index element={<ChatsPage />} />
               <Route path="chats" element={<ChatsPage />} />
+              <Route path="chats/:handle" element={<ChatsPage />} />
+              <Route path="about" element={<Landing />} />
+              <Route path="friends" element={<FriendsPage />} />
+              <Route path="market" element={<MarketPage />} />
               <Route path="communities" element={<CommunitiesPage />} />
               <Route path="communities/new" element={<CreateCommunity />} />
               <Route path="c/:communityId" element={<CommunityPage />} />

@@ -3,7 +3,7 @@ import { ScreenHead } from '../components/AppShell';
 import { CopyButton } from '../components/CopyButton';
 import { FileList, ObjectViewer } from '../components/ObjectViewer';
 import { ItemVisual } from '../components/ItemVisual';
-import { formatMeowe, shortHash } from '../format';
+import { shortHash } from '../format';
 import { GUEST_HANDLE } from '../services/catalog';
 import { useItem, useProfile } from '../services/hooks';
 import { usePageTitle } from '../usePageTitle';
@@ -73,13 +73,7 @@ export function ItemPage() {
               ))}
             </ul>
           ) : null}
-          {item.previewMeowe ? (
-            <p className="micro">
-              Shelf illustration: {formatMeowe(item.previewMeowe)} MEOWE. Not for sale.
-            </p>
-          ) : (
-            <p className="micro">Not listed. Trading is not on.</p>
-          )}
+          <p className="micro">Trading coming soon. Listings stay on this profile.</p>
           <div className="badge-row">
             <CopyButton label="Object CID" value={item.cid} display={shortHash(item.cid, 10, 6)} />
             {item.files.map((file) => (
