@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { listedChannels } from '../services/directory';
 import { useChannels, useJoinedCommunities } from '../services/hooks';
 import { usePageTitle } from '../usePageTitle';
 
@@ -10,7 +11,7 @@ export function CommunitiesPage() {
     <section className="mpanel">
       <h1>Spaces</h1>
       <p className="micro">
-        A Space is an on-chain object on Dogecoin (P2FK). Its creator can give or transfer it like any other object.
+        A Space is an on-chain object on Dogecoin (P2FK). Giving it also gives the channels its owner holds.
       </p>
       <p>
         <Link className="btn" to="/communities/new">
@@ -19,7 +20,7 @@ export function CommunitiesPage() {
       </p>
       <ul className="directory">
         {spaces.map((space) => {
-          const count = channels.filter((channel) => channel.communityId === space.id).length;
+          const count = listedChannels(space, channels).length;
           return (
             <li key={space.id}>
               <Link className="row" to={`/c/${space.id}`}>

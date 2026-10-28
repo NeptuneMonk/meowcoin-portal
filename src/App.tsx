@@ -11,6 +11,7 @@ import { ItemPage } from './pages/ItemPage';
 import { Landing } from './pages/Landing';
 import { MarketPage } from './pages/MarketPage';
 import { MePage } from './pages/MePage';
+import { MintChannelPage } from './pages/MintChannelPage';
 import { MintPage } from './pages/MintPage';
 import { NotFound } from './pages/NotFound';
 import { ProfilePage } from './pages/ProfilePage';
@@ -33,6 +34,7 @@ export function App() {
               <Route path="communities" element={<CommunitiesPage />} />
               <Route path="communities/new" element={<CreateCommunity />} />
               <Route path="c/:communityId" element={<CommunityPage />} />
+              <Route path="c/:communityId/new-channel" element={<MintChannelPage />} />
               <Route path="c/:communityId/:channelId" element={<ChatPage />} />
               <Route path="store" element={<StorePage />} />
               <Route path="me" element={<MePage />} />

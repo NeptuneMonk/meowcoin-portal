@@ -27,7 +27,8 @@ type Name =
   | 'video'
   | 'book'
   | 'app'
-  | 'text';
+  | 'text'
+  | 'info';
 
 const PATHS: Record<Name, string> = {
   bubble:
@@ -69,6 +70,7 @@ const PATHS: Record<Name, string> = {
   book: 'M6 2h12v20l-6-3-6 3V2z',
   app: 'M8.6 16.6 4 12l4.6-4.6L10 8.8 6.8 12l3.2 3.2-1.4 1.4zm6.8 0L14 15.2l3.2-3.2L14 8.8l1.4-1.4L20 12l-4.6 4.6z',
   text: 'M4 5h16v2H4V5zm0 4h16v2H4V9zm0 4h10v2H4v-2z',
+  info: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1 5h2v2h-2V7zm0 4h2v6h-2v-6z',
 };
 
 export function Icon({
@@ -81,7 +83,7 @@ export function Icon({
   const wide = name === 'chain' || name === 'down' ? 16 : name === 'camera' ? 26 : name === 'share' || name === 'transfer' ? 18 : undefined;
   return (
     <svg className={className} viewBox="0 0 24 24" width={wide} height={wide} aria-hidden="true">
-      <path d={PATHS[name]} />
+      <path fillRule={name === 'info' ? 'evenodd' : undefined} d={PATHS[name]} />
     </svg>
   );
 }

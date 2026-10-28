@@ -1,8 +1,10 @@
 # The Forge — MEOWE Portal (guest demo)
 
-This is a tour of the MEOWE Portal, nicknamed **the Forge**. It is the app where a person will keep a profile, mint a Space, chat in text channels, and mint items onto a storefront, paying only in MEOWE. A picture they upload is meant for IPFS. A Solana memo carries the content id. The profile, the Space, and the item are written on Dogecoin in the Sup style, called P2FK. A Space is an on-chain object. Its creator can give or transfer it like any other object.
+This is a tour of the MEOWE Portal, nicknamed **the Forge**. It is the app where a person will keep a profile, mint a Space, chat in text channels, and mint items onto a storefront, paying only in MEOWE. A picture they upload is meant for IPFS. A Solana memo carries the content id.
 
-**This build is a guest demo.** The cats, Spaces, and messages are samples. The burn counter is an illustration. Picking a picture, sending it, or minting it walks the steps and then stops. The picture stays on your device. Nothing here creates a wallet, asks for a seed phrase, signs a transaction, or talks to Solana, Dogecoin, or IPFS. Minting a Space in the demo shows a cost of **— MEOWE** and does not mint anything.
+Ownership is written on Dogecoin as its own P2FK transaction: a profile, a store mint, a Space, a channel, a give, or a buy. A follow and a message are taxed in MEOWE on Solana, then recorded to Dogecoin in a bulk batch. A Space uses license `meowe:space`. Each text channel is its own object with license `meowe:space:channel` and `uri` set to the parent Space’s address. A channel counts only when its creator is the Space owner. Messages in a channel are sent to that channel’s address. Giving a Space also gives the channels its owner holds. Private messages will be end-to-end encrypted, following Sup’s PKX and PKY.
+
+**This build is a guest demo.** The cats, Spaces, and messages are samples. The burn counter is an illustration. Picking a picture, sending it, or minting it walks the steps and then stops. The picture stays on your device. Nothing here creates a wallet, asks for a seed phrase, signs a transaction, or talks to Solana, Dogecoin, or IPFS. Minting a Space or a channel in the demo shows a cost of **— MEOWE** and does not mint anything.
 
 How the live portal will keep messages, profiles, and private notes is written in plain language in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). The Messages screen shows sample direct threads. Nothing there is sent. When private messages are added for real, they will be end-to-end encrypted, the way Sup encrypts to a profile’s public key (PKX and PKY).
 
@@ -19,7 +21,7 @@ The Forge page says **DEMO MODE — no real transactions**. The footer says **No
 
 - **Messages** — the bubble on the left rail. On a phone this is a list. Tap one to open it. On a wide screen the conversation sits in the middle and that cat’s profile sits on the right. The threads are samples.
 - **Spaces** — round icons under the bubble. A Space has text channels and an on-chain card (owner, minted on Dogecoin via P2FK, transferable). The **+** opens **Mint a Space**. The form asks for an icon, a name, and a description. The cost line says **— MEOWE**.
-- **A channel** — messages from the sample cats. Each one cost about a penny. Open **kept on Doge** to see the content id and the Dogecoin record. Those values are simulated. You can type a message or attach a picture from your device.
+- **A channel** — messages from the sample cats. Each one cost about a penny and is sent to the channel’s own object address. Open the channel name or the info icon for the object: address, parent Space, license `meowe:space:channel`, creator, minted directly on Dogecoin, transferable. Open **kept on Doge** for the simulated record. The **+** on **Text channels** shows for the Space owner and opens **Mint a channel**. The cost line says **— MEOWE**. The attach **+** in the composer can upload a file, pick an object from your store, or paste any object address. A shared object shows as a card. An unknown address says it is not found in demo data.
 - **A profile storefront** — items that profile minted or holds. There is no global marketplace. Marketplace says **Trading coming soon**. A shelf can hold an image, a video, a sound, a PDF, or a small app. Open one.
 - **Mint an item** — add one file or many, including a folder. Pick the main file. The preview stays on this device. An app with `index.html` can be launched in the demo.
 - **Your profile** — the name in the corner. Your picture, your bio, and the Spaces you own. Choose a profile picture from your device. The accent colour is taken from that picture.
@@ -49,7 +51,7 @@ There is one illustration rate: **one penny buys 1,246 MEOWE**. Every fee uses t
 | Profile picture | $0.15 | 18,690 | 5,607 |
 | Mint a Space | $0.15 | 18,690 | 5,607 |
 
-A profile picture at fifteen cents is 18,690 MEOWE at this rate (the public illustration rounds the same idea to about 19,000). The burn story on the front page is the message: 1,000 messages a day burns about 136.5 million MEOWE a year, about 14% of the 960.7 million still out there. Because the fee is a few pennies, the same cent burns fewer tokens if MEOWE is worth more. The counter is labeled **Illustration · not live**.
+Those rows are illustration rates for the taxed message and for the older fee sketch. Minting a Space or a channel in this demo shows **— MEOWE**. Nothing is minted. A profile picture at fifteen cents is 18,690 MEOWE at this rate (the public illustration rounds the same idea to about 19,000). The burn story on the front page is the message: 1,000 messages a day burns about 136.5 million MEOWE a year, about 14% of the 960.7 million still out there. Because the fee is a few pennies, the same cent burns fewer tokens if MEOWE is worth more. The counter is labeled **Illustration · not live**.
 
 ## Run it on your computer
 
@@ -96,7 +98,7 @@ These later phases plug in behind the same screens. The buttons and pages stay. 
 1. **Wallet creation.** A portal-generated Solana wallet. The screen still never shows a secret key. `createWallet()` in `src/services/mockWallet.ts` is the seam.
 2. **Relayer.** Takes the MEOWE fee, burns 30%, swaps 60% toward the Dogecoin record, and sends 10% to community nodes. `submit()` in `src/services/mockRelayer.ts` is the seam. It already accepts a message, a profile picture, a Space, and a minted item.
 3. **IPFS pinning.** Real content ids for pictures people upload. `pin()` in `src/services/mockIpfs.ts` is the seam. The demo keeps the file on the device.
-4. **Dogecoin indexer.** Reads Sup-style P2FK records so profiles, items, Spaces, and messages come from the chain. The read side is `src/services/mockIndexer.ts`, exposed as the indexer, the Space service, and the chat service.
+4. **Dogecoin indexer.** Reads Sup-style P2FK records so profiles, items, Spaces, channels, and messages come from the chain. The read side is `src/services/mockIndexer.ts`, exposed as the indexer, the Space service, and the chat service.
 5. **Marketplace trading.** A purchase is on that profile’s storefront. There is no separate marketplace yet. The button stays on **Trading coming soon**.
 6. **Private messages.** End-to-end encrypted to the recipient profile’s public key (PKX and PKY), following Sup. `encryptFor` and `decrypt` in `src/services/mockEncryption.ts` are the seam. The mock does not encrypt. The Messages screen is a sample of that later screen.
 7. **Later ideas, not built.** A paid promotion, with 50% of the fee burned (the rest is still to be decided). An optional “carve it on Doge” upgrade that writes one message fully onto Dogecoin.

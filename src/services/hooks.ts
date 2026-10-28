@@ -116,7 +116,7 @@ export function useRecentChats(): readonly RecentChat[] {
     for (const channel of channels) {
       if (!joined.has(channel.communityId)) continue;
       const community = communities.find((entry) => entry.id === channel.communityId);
-      if (!community) continue;
+      if (!community || channel.creatorHandle !== community.ownerHandle) continue;
       const last = [...messages].reverse().find((entry) => entry.channelId === channel.id) ?? null;
       const order = last ? messages.lastIndexOf(last) : -1;
       rows.push({ row: { channel, community, last }, order });

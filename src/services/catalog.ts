@@ -1,4 +1,10 @@
 import { GUEST_LOOK } from '../content/looks';
+import {
+  channelAddress,
+  itemAddress,
+  profileAddress,
+  spaceAddress,
+} from './directory';
 import { demoMedia } from './demoMedia';
 import { demoAddress, demoCid, demoTxid } from './ids';
 import { POST_QUOTE } from './pricing';
@@ -31,6 +37,7 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Life 2',
     walletLabel: demoAddress('profile:ninelives'),
+    address: profileAddress('ninelives'),
     localImageUrl: null,
     forgedHere: false,
   },
@@ -48,6 +55,7 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Smithy',
     walletLabel: demoAddress('profile:whiskersmith'),
+    address: profileAddress('whiskersmith'),
     localImageUrl: null,
     forgedHere: false,
   },
@@ -65,6 +73,7 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Scribe',
     walletLabel: demoAddress('profile:pawscript'),
+    address: profileAddress('pawscript'),
     localImageUrl: null,
     forgedHere: false,
   },
@@ -82,6 +91,7 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Collector',
     walletLabel: demoAddress('profile:goldnip'),
+    address: profileAddress('goldnip'),
     localImageUrl: null,
     forgedHere: false,
   },
@@ -99,6 +109,7 @@ const profiles: Profile[] = [
     },
     joinedLabel: 'Node',
     walletLabel: demoAddress('profile:voidnap'),
+    address: profileAddress('voidnap'),
     localImageUrl: null,
     forgedHere: false,
   },
@@ -110,6 +121,7 @@ const profiles: Profile[] = [
     look: GUEST_LOOK,
     joinedLabel: 'Just visiting',
     walletLabel: demoAddress('profile:you'),
+    address: profileAddress('you'),
     localImageUrl: null,
     forgedHere: false,
   },
@@ -124,6 +136,7 @@ const communities: Community[] = [
     hue: '#6d4bd8',
     mark: '9',
     forgedHere: false,
+    address: spaceAddress('nine-lives'),
   },
   {
     id: 'smithy',
@@ -133,6 +146,7 @@ const communities: Community[] = [
     hue: '#3a3c43',
     mark: 'S',
     forgedHere: false,
+    address: spaceAddress('smithy'),
   },
   {
     id: 'node-night',
@@ -142,40 +156,42 @@ const communities: Community[] = [
     hue: '#16655e',
     mark: '🌙',
     forgedHere: false,
+    address: spaceAddress('node-night'),
   },
 ];
 
+function channel(
+  id: string,
+  communityId: string,
+  name: string,
+  topic: string,
+  ownerHandle: string,
+  creatorHandle = ownerHandle,
+): Channel {
+  return {
+    id,
+    communityId,
+    name,
+    topic,
+    address: channelAddress(id),
+    creatorHandle,
+    ownerHandle,
+  };
+}
+
 const channels: Channel[] = [
-  {
-    id: 'nine-lives-general',
-    communityId: 'nine-lives',
-    name: 'general',
-    topic: 'The front room.',
-  },
-  {
-    id: 'nine-lives-lore',
-    communityId: 'nine-lives',
-    name: 'lore',
-    topic: 'How the emoji got a second life.',
-  },
-  {
-    id: 'smithy-general',
-    communityId: 'smithy',
-    name: 'general',
-    topic: 'The smithy floor.',
-  },
-  {
-    id: 'smithy-memes',
-    communityId: 'smithy',
-    name: 'memes',
-    topic: 'Pictures worth a penny.',
-  },
-  {
-    id: 'node-night-general',
-    communityId: 'node-night',
-    name: 'general',
-    topic: 'Quiet channel. Still on the clock.',
-  },
+  channel('nine-lives-general', 'nine-lives', 'general', 'The front room.', 'ninelives'),
+  channel('nine-lives-lore', 'nine-lives', 'lore', 'How the emoji got a second life.', 'ninelives'),
+  channel(
+    'nine-lives-aside',
+    'nine-lives',
+    'aside',
+    'Minted by someone other than the Space owner, so it does not count.',
+    'goldnip',
+  ),
+  channel('smithy-general', 'smithy', 'general', 'The smithy floor.', 'whiskersmith'),
+  channel('smithy-memes', 'smithy', 'memes', 'Pictures worth a penny.', 'whiskersmith'),
+  channel('node-night-general', 'node-night', 'general', 'Quiet channel. Still on the clock.', 'voidnap'),
 ];
 
 const memberships: Membership[] = [
@@ -200,6 +216,7 @@ function message(
   handle: string,
   text: string,
   createdLabel: string,
+  sharedAddress: string | null = null,
 ): ChatMessage {
   return {
     id,
@@ -212,6 +229,8 @@ function message(
     cid: demoCid(`msg:${id}`),
     dogeTxid: demoTxid(`msg:${id}`),
     forgedHere: false,
+    sentTo: channelAddress(channelId),
+    sharedAddress,
   };
 }
 
@@ -251,6 +270,22 @@ const messages: ChatMessage[] = [
     'pawscript',
     'A message is about one cent. Part of that cent is burned for good.',
     'Today 8:41 PM',
+  ),
+  message(
+    'm-share-item',
+    'nine-lives-general',
+    'whiskersmith',
+    'The medallion is its own object. Here it is, passed in a message.',
+    'Today 8:48 PM',
+    itemAddress('medallion'),
+  ),
+  message(
+    'm-share-space',
+    'nine-lives-general',
+    'ninelives',
+    'Nine Lives is a Space object. Giving it carries the channels I hold.',
+    'Today 8:52 PM',
+    spaceAddress('nine-lives'),
   ),
   message(
     'm-nodes-room',
@@ -302,6 +337,14 @@ const messages: ChatMessage[] = [
     '1d ago',
   ),
   message(
+    'm-share-channel',
+    'smithy-memes',
+    'pawscript',
+    'This channel is its own object. Messages here are sent to its address.',
+    '1d ago',
+    channelAddress('smithy-memes'),
+  ),
+  message(
     'm-nodes',
     'node-night-general',
     'voidnap',
@@ -324,7 +367,7 @@ function item(
   art: Item['art'],
   creatorHandle: string,
   ownerHandle: string,
-  previewMeowe: number,
+  previewMeowe: number | null,
 ): Item {
   return {
     id,
@@ -338,6 +381,7 @@ function item(
     cid: demoCid(`item:${id}`),
     dogeTxid: demoTxid(`item:${id}`),
     forgedHere: false,
+    address: itemAddress(id),
     urn: id,
     uri: null,
     img: null,
@@ -405,6 +449,7 @@ function objectItem(
     cid: demoCid(`item:${id}`),
     dogeTxid: demoTxid(`item:${id}`),
     forgedHere: false,
+    address: itemAddress(id),
     uri: null,
     qty: 1,
     ...extra,
@@ -552,6 +597,15 @@ const items: Item[] = [
       creators: ['goldnip'],
       mintedLabel: 'Jun 2024',
     },
+  ),
+  item(
+    'pocket-sketch',
+    'Pocket Sketch',
+    'A sample object on your shelf. It is not listed for sale.',
+    'stamp',
+    GUEST_HANDLE,
+    GUEST_HANDLE,
+    null,
   ),
   objectItem(
     'cat-clicker',

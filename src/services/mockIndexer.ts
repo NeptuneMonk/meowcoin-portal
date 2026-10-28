@@ -1,4 +1,5 @@
 import { buildCatalog, GUEST_HANDLE } from './catalog';
+import { channelAddress, spaceAddress } from './directory';
 import { slugHandle } from './ids';
 import { itemFromMint } from './objects';
 import type {
@@ -88,6 +89,8 @@ export class MockIndexer implements IndexerService, CommunityService, ChatServic
         cid: receipt.cid,
         dogeTxid: receipt.dogeTxid,
         forgedHere: true,
+        sentTo: channel.address,
+        sharedAddress: request.sharedAddress,
       };
       this.messages = [...this.messages, message];
       this.emit();
@@ -116,18 +119,42 @@ export class MockIndexer implements IndexerService, CommunityService, ChatServic
         hue: HUES[n % HUES.length] ?? HUES[0],
         mark: markFrom(request.name),
         forgedHere: true,
+        address: spaceAddress(id),
       };
+      const generalId = `${id}-general`;
       const channel: Channel = {
-        id: `${id}-general`,
+        id: generalId,
         communityId: id,
         name: 'general',
         topic: 'The front room.',
+        address: channelAddress(generalId),
+        creatorHandle: GUEST_HANDLE,
+        ownerHandle: GUEST_HANDLE,
       };
       this.communities = [community, ...this.communities];
       this.channels = [...this.channels, channel];
       this.memberships = [...this.memberships, { communityId: id, handle: GUEST_HANDLE }];
       this.emit();
       return { id: community.id, handle: GUEST_HANDLE };
+    }
+
+    if (request.action === 'channel') {
+      const space = this.communities.find((entry) => entry.id === request.communityId);
+      if (!space) throw new Error('That Space is not in this demo.');
+      if (space.ownerHandle !== GUEST_HANDLE) throw new Error('Only the Space owner can mint a channel.');
+      const id = uniqueChannelId(space.id, request.name, this.channels);
+      const channel: Channel = {
+        id,
+        communityId: space.id,
+        name: request.name.trim(),
+        topic: request.topic.trim(),
+        address: channelAddress(id),
+        creatorHandle: GUEST_HANDLE,
+        ownerHandle: GUEST_HANDLE,
+      };
+      this.channels = [...this.channels, channel];
+      this.emit();
+      return { id: channel.id, handle: GUEST_HANDLE };
     }
 
     const minted: Item = itemFromMint(
@@ -149,6 +176,15 @@ export class MockIndexer implements IndexerService, CommunityService, ChatServic
 function uniqueCommunityId(name: string, existing: readonly Community[]): string {
   const base = slugHandle(name) || 'community';
   const taken = new Set(existing.map((community) => community.id));
+  if (!taken.has(base)) return base;
+  let n = 2;
+  while (taken.has(`${base}${n}`)) n += 1;
+  return `${base}${n}`;
+}
+
+function uniqueChannelId(communityId: string, name: string, existing: readonly Channel[]): string {
+  const base = `${communityId}-${slugHandle(name) || 'channel'}`;
+  const taken = new Set(existing.map((channel) => channel.id));
   if (!taken.has(base)) return base;
   let n = 2;
   while (taken.has(`${base}${n}`)) n += 1;

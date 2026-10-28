@@ -65,6 +65,8 @@ export interface Profile {
   look: CatLook;
   joinedLabel: string;
   walletLabel: string;
+  /** P2FK object address. Unique across profiles, items, Spaces, and channels. */
+  address: string;
   /** Object URL for a picture picked on this device. Never a remote address. */
   localImageUrl: string | null;
   forgedHere: boolean;
@@ -110,6 +112,8 @@ export interface Item {
   cid: string;
   dogeTxid: string;
   forgedHere: boolean;
+  /** P2FK object address. Unique across profiles, items, Spaces, and channels. */
+  address: string;
   /** Sup `urn`. */
   urn: string;
   /** Sup `uri`. */
@@ -143,6 +147,8 @@ export interface Community {
   hue: string;
   mark: string;
   forgedHere: boolean;
+  /** P2FK object address. License is `meowe:space`. */
+  address: string;
 }
 
 export interface Channel {
@@ -150,6 +156,12 @@ export interface Channel {
   communityId: string;
   name: string;
   topic: string;
+  /** P2FK object address. License is `meowe:space:channel`. `uri` is the parent Space address. */
+  address: string;
+  /** Counts only when this is the Space owner's handle. */
+  creatorHandle: string;
+  /** Who holds the channel object. Giving a Space also gives the channels this owner holds. */
+  ownerHandle: string;
 }
 
 export interface Membership {
@@ -169,6 +181,10 @@ export interface ChatMessage {
   cid: string;
   dogeTxid: string;
   forgedHere: boolean;
+  /** Channel object address this message was sent to. */
+  sentTo: string;
+  /** Object shared in this message, or null. */
+  sharedAddress: string | null;
 }
 
 export type ForgeRequest =
@@ -177,6 +193,7 @@ export type ForgeRequest =
       channelId: string;
       text: string;
       localImageUrl: string | null;
+      sharedAddress: string | null;
       quote: FeeQuote;
     }
   | {
@@ -209,6 +226,12 @@ export type ForgeRequest =
       name: string;
       topic: string;
       quote: FeeQuote;
+    }
+  | {
+      action: 'channel';
+      communityId: string;
+      name: string;
+      topic: string;
     };
 
 /** What a relayer would get back from the chains. No local id yet. */

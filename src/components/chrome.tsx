@@ -4,7 +4,9 @@ import { accentVars, nameColor } from '../accent';
 import { displayHandle, presenceOf } from '../avatars';
 import { SAMPLE_THREADS } from '../content/samples';
 import { PRIVATE_DMS } from '../content/site';
+import { shortHash } from '../format';
 import { GUEST_HANDLE } from '../services/catalog';
+import { SPACE_LICENSE, listedChannels } from '../services/directory';
 import {
   useChannels,
   useCommunities,
@@ -16,7 +18,9 @@ import {
   useShelf,
 } from '../services/hooks';
 import type { Community } from '../services/types';
+import type { Channel } from '../services/types';
 import { Avatar } from './Avatar';
+import { ChannelDetails, ChannelInfoButton } from './ChannelDetails';
 import { Icon } from './Icons';
 import { KindTile } from './KindTile';
 import { useAccent } from './useAccent';
@@ -130,9 +134,11 @@ export function SpaceSide({
 }) {
   const communities = useCommunities();
   const channels = useChannels();
+  const [detail, setDetail] = useState<Channel | null>(null);
   const space = communities.find((entry) => entry.id === communityId);
   if (!space) return null;
-  const mine = channels.filter((channel) => channel.communityId === communityId);
+  const mine = listedChannels(space, channels);
+  const owner = space.ownerHandle === GUEST_HANDLE;
   return (
     <aside className="side">
       <div className="side-h">
@@ -145,15 +151,22 @@ export function SpaceSide({
         <OnChainCard space={space} />
         <div className="cat">
           <span>Text channels</span>
+          {owner ? (
+            <Link className="add" to={`/c/${space.id}/new-channel`} aria-label="Mint a channel">
+              <Icon name="plus" className="i tiny" />
+            </Link>
+          ) : null}
         </div>
         {mine.map((channel) => (
-          <NavLink
-            key={channel.id}
-            className={({ isActive }) => `ch${isActive || channel.id === activeChannelId ? ' on' : ''}`}
-            to={`/c/${space.id}/${channel.id}`}
-          >
-            <span className="hash">#</span> {channel.name}
-          </NavLink>
+          <div className="ch-row" key={channel.id}>
+            <NavLink
+              className={({ isActive }) => `ch${isActive || channel.id === activeChannelId ? ' on' : ''}`}
+              to={`/c/${space.id}/${channel.id}`}
+            >
+              <span className="hash">#</span> {channel.name}
+            </NavLink>
+            <ChannelInfoButton channelName={channel.name} onOpen={() => setDetail(channel)} />
+          </div>
         ))}
         <div className="cat">
           <span>Shelf</span>
@@ -165,6 +178,7 @@ export function SpaceSide({
           storefronts
         </NavLink>
       </div>
+      {detail ? <ChannelDetails space={space} channel={detail} onClose={() => setDetail(null)} /> : null}
     </aside>
   );
 }
@@ -182,6 +196,14 @@ export function OnChainCard({ space }: { space: Community }) {
         <b>@{displayHandle(space.ownerHandle)}</b>
       </div>
       <div className="row">
+        <span>License</span>
+        <b>{SPACE_LICENSE}</b>
+      </div>
+      <div className="row">
+        <span>Address</span>
+        <b title={space.address}>{shortHash(space.address, 6, 4)}</b>
+      </div>
+      <div className="row">
         <span>Minted on</span>
         <b>Dogecoin · P2FK</b>
       </div>
@@ -189,6 +211,7 @@ export function OnChainCard({ space }: { space: Community }) {
         <span>Transferable</span>
         <b>Yes</b>
       </div>
+      <p className="carry">Giving this Space also gives the channels its owner holds.</p>
     </div>
   );
 }

@@ -85,6 +85,7 @@ describe('demo services', () => {
         channelId: channel!.id,
         text: 'stays here',
         localImageUrl: 'blob:http://demo/local',
+        sharedAddress: null,
         quote,
       });
       const mint = await services.pricing.quote('mint');
@@ -161,6 +162,7 @@ describe('demo services', () => {
       channelId: channel!.id,
       text: 'hello forge',
       localImageUrl: null,
+      sharedAddress: null,
       quote,
     });
     expect(posted.simulated).toBe(true);
@@ -172,6 +174,8 @@ describe('demo services', () => {
     expect(inChannel).toHaveLength(before + 1);
     expect(inChannel.at(-1)?.handle).toBe(GUEST_HANDLE);
     expect(inChannel.at(-1)?.burned).toBe(374);
+    expect(inChannel.at(-1)?.sentTo).toBe(channel!.address);
+    expect(inChannel.at(-1)?.sharedAddress).toBeNull();
 
     const picture = await services.pricing.quote('profile');
     await services.relayer.submit({
@@ -197,11 +201,32 @@ describe('demo services', () => {
       .find((entry) => entry.id === created.entityId);
     expect(community?.ownerHandle).toBe(GUEST_HANDLE);
     expect(community?.forgedHere).toBe(true);
-    expect(
-      services.communities
-        .getChannelsSnapshot()
-        .some((entry) => entry.communityId === created.entityId && entry.name === 'general'),
-    ).toBe(true);
+    expect(community?.address).toMatch(ADDRESS);
+    const general = services.communities
+      .getChannelsSnapshot()
+      .find((entry) => entry.communityId === created.entityId && entry.name === 'general');
+    expect(general?.creatorHandle).toBe(GUEST_HANDLE);
+    expect(general?.ownerHandle).toBe(GUEST_HANDLE);
+    expect(general?.address).toMatch(ADDRESS);
+    const mintedChannel = await services.relayer.submit({
+      action: 'channel',
+      communityId: created.entityId,
+      name: 'loft',
+      topic: 'A quiet shelf.',
+    });
+    const loft = services.communities
+      .getChannelsSnapshot()
+      .find((entry) => entry.id === mintedChannel.entityId);
+    expect(loft?.creatorHandle).toBe(GUEST_HANDLE);
+    expect(loft?.communityId).toBe(created.entityId);
+    await expect(
+      services.relayer.submit({
+        action: 'channel',
+        communityId: 'nine-lives',
+        name: 'nope',
+        topic: 'Not the owner.',
+      }),
+    ).rejects.toThrow(/owner/);
 
     const mintQuote = await services.pricing.quote('mint');
     const minted = await services.relayer.submit({

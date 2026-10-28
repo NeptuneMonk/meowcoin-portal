@@ -5,6 +5,7 @@ import { useProfiles } from '../services/hooks';
 import { CopyButton } from './CopyButton';
 import { Avatar } from './Avatar';
 import { Icon } from './Icons';
+import { ObjectCard } from './ObjectCard';
 import { useAccent } from './useAccent';
 import { shortHash } from '../format';
 import { formatMeowe } from '../format';
@@ -13,6 +14,7 @@ export interface StreamRecord {
   burned: number;
   cid: string;
   dogeTxid: string;
+  sentTo?: string;
 }
 
 export type StreamItem =
@@ -26,6 +28,7 @@ export type StreamItem =
       cont?: boolean;
       image?: string | null;
       owner?: boolean;
+      sharedAddress?: string | null;
       record?: StreamRecord;
     };
 
@@ -47,6 +50,7 @@ export function MessageStream({ items }: { items: StreamItem[] }) {
             <div className="msg cont" key={item.key}>
               <div className="tx">
                 {item.text ? <p>{item.text}</p> : null}
+                {item.sharedAddress ? <ObjectCard address={item.sharedAddress} /> : null}
                 {item.image ? (
                   <img className="msg-pic" src={item.image} alt="Image sent from this device" />
                 ) : null}
@@ -90,6 +94,7 @@ function MessageRow({
           {item.record ? <RecordChip record={item.record} /> : null}
         </div>
         {item.text ? <p>{item.text}</p> : null}
+        {item.sharedAddress ? <ObjectCard address={item.sharedAddress} /> : null}
         {item.image ? (
           <>
             <img className="msg-pic" src={item.image} alt="Image sent from this device" />
@@ -108,6 +113,9 @@ function RecordChip({ record }: { record: StreamRecord }) {
         <Icon name="chain" />
       </summary>
       <p className="micro">Simulated record. Burned {formatMeowe(record.burned)} MEOWE.</p>
+      {record.sentTo ? (
+        <CopyButton label="Sent to channel" value={record.sentTo} display={shortHash(record.sentTo, 8, 4)} />
+      ) : null}
       <CopyButton label="IPFS CID" value={record.cid} display={shortHash(record.cid, 10, 6)} />
       <CopyButton label="Dogecoin record" value={record.dogeTxid} display={shortHash(record.dogeTxid, 8, 4)} />
     </details>

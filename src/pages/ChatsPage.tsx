@@ -1,14 +1,18 @@
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { nameColor } from '../accent';
 import { displayHandle } from '../avatars';
+import { AttachMenu } from '../components/AttachMenu';
 import { Avatar } from '../components/Avatar';
 import { Icon } from '../components/Icons';
+import { ObjectCard } from '../components/ObjectCard';
 import { MessageStream, type StreamItem } from '../components/MessageStream';
 import { useAccent } from '../components/useAccent';
 import { useMedia } from '../components/useMedia';
 import { PRIVATE_DMS } from '../content/site';
 import { isDay, sampleThread, SAMPLE_THREADS, type SampleEntry } from '../content/samples';
 import { useProfiles } from '../services/hooks';
+import { localImageUrl } from '../services/images';
 import { usePageTitle } from '../usePageTitle';
 import { NotFound } from './NotFound';
 
@@ -98,6 +102,12 @@ function DmThread({ handle }: { handle: string }) {
   const thread = sampleThread(handle);
   const profiles = useProfiles();
   const profile = profiles.find((entry) => entry.handle === handle);
+  const [shared, setShared] = useState<string | null>(null);
+  const [image, setImage] = useState<string | null>(null);
+  useEffect(() => {
+    setShared(null);
+    setImage(null);
+  }, [handle]);
   if (!thread || !profile) return <NotFound />;
   const rows = entriesToRows(thread.entries);
   return (
@@ -138,10 +148,36 @@ function DmThread({ handle }: { handle: string }) {
           <MessageStream items={rows} />
         </div>
       </div>
-      <div className="composer only-desk" aria-hidden="true">
-        <span className="ico">
-          <Icon name="add" />
-        </span>
+      {image || shared ? (
+        <div className="attach-preview">
+          {shared ? (
+            <div className="preview-card">
+              <ObjectCard address={shared} />
+            </div>
+          ) : null}
+          {image ? <img src={image} alt="Image that stays on this device" /> : null}
+          <button
+            className="btn ghost"
+            type="button"
+            onClick={() => {
+              setShared(null);
+              setImage(null);
+            }}
+          >
+            Remove
+          </button>
+          <span className="micro">This thread is a sample. Nothing is sent.</span>
+        </div>
+      ) : null}
+      <div className="composer only-desk">
+        <AttachMenu
+          key={`${handle}-desk`}
+          onFile={(file) => {
+            if (!file || !file.type.startsWith('image/')) return;
+            setImage(localImageUrl(file));
+          }}
+          onObject={setShared}
+        />
         <span className="ph">Message @{displayHandle(handle)}</span>
         <span className="cost">
           <Icon name="chain" /> kept on Doge
@@ -154,9 +190,15 @@ function DmThread({ handle }: { handle: string }) {
         </span>
       </div>
       <div className="mcomp only-mob">
-        <span className="pl">
-          <Icon name="plus" />
-        </span>
+        <AttachMenu
+          key={`${handle}-mob`}
+          round
+          onFile={(file) => {
+            if (!file || !file.type.startsWith('image/')) return;
+            setImage(localImageUrl(file));
+          }}
+          onObject={setShared}
+        />
         <span className="f">
           Message @{displayHandle(handle)} <Icon name="smile" />
         </span>
@@ -175,6 +217,7 @@ function entriesToRows(entries: SampleEntry[]): StreamItem[] {
       text: entry.text,
       time: entry.time,
       cont: entry.cont,
+      sharedAddress: entry.sharedAddress,
     };
   });
 }

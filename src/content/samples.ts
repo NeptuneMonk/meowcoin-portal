@@ -1,9 +1,13 @@
+import { profileAddress } from '../services/directory';
+
 /** Sample direct threads for the Messages screen. Nothing here is sent or encrypted. */
 export interface SampleLine {
   handle: string;
   text: string;
   time: string;
   cont?: boolean;
+  /** Object address shared in this sample line. */
+  sharedAddress?: string;
 }
 
 export type SampleEntry = { day: string } | SampleLine;
@@ -46,6 +50,12 @@ export const SAMPLE_THREADS: SampleThread[] = [
         text: 'Ping me when the first one is minted.',
         time: 'Today 9:33 PM',
         cont: true,
+      },
+      {
+        handle: 'you',
+        text: 'This is Ninelives, as an object. Every object has its own address.',
+        time: 'Today 9:34 PM',
+        sharedAddress: profileAddress('ninelives'),
       },
     ],
   },
