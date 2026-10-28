@@ -126,6 +126,7 @@ export function MintPage() {
       cid: 'pending',
       dogeTxid: 'pending',
       forgedHere: true,
+      address: 'pending',
       urn: urn.trim() || 'Assigned when you mint',
       uri: null,
       img: null,

@@ -17,11 +17,11 @@ import { usePageTitle } from '../usePageTitle';
 const STEPS = [
   {
     title: 'Mint a Space',
-    body: 'A Space is an on-chain object on Dogecoin (P2FK). You own it, and you can give or transfer it like any other object.',
+    body: 'A Space is an on-chain object (meowe:space). Each text channel is its own object too. Giving the Space also gives the channels its owner holds.',
   },
   {
     title: 'A message is a penny',
-    body: 'Sending a message in a Space costs about one cent in MEOWE. You can attach a picture from your device.',
+    body: 'A message is sent to the channel’s object address and costs about one cent in MEOWE. You can attach a picture or share another object.',
   },
   {
     title: 'Split the fee',
@@ -108,8 +108,8 @@ export function Landing() {
         <section className="section" aria-labelledby="price-heading">
           <h2 id="price-heading">Illustration rates</h2>
           <p className="micro">
-            These are the portal’s illustration rates. Minting a Space in this demo shows — MEOWE,
-            because nothing is minted.
+            These are the portal’s illustration rates. Minting a Space or a channel in this demo shows — MEOWE,
+            because nothing is minted. Ownership writes go straight to Dogecoin. A message and a follow are the taxed MEOWE actions.
           </p>
           <ul className="price-grid">
             {PRICES.map(({ quote, label }) => (

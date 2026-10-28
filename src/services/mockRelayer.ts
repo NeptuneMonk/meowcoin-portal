@@ -31,7 +31,7 @@ export class MockRelayer implements RelayerService {
       dogeTxid: demoTxid(pin.cid),
       solanaSignature: demoSignature(pin.cid),
       memo,
-      burned: request.quote.split.burn,
+      burned: request.action === 'channel' ? 0 : request.quote.split.burn,
       simulated: true as const,
     };
     const ref = this.sink.record(request, chain);
@@ -40,7 +40,7 @@ export class MockRelayer implements RelayerService {
 }
 
 function labelOf(request: ForgeRequest): string {
-  if (request.action === 'message') return request.text.slice(0, 80) || 'image';
+  if (request.action === 'message') return request.text.slice(0, 80) || request.sharedAddress || 'image';
   if (request.action === 'profile') return 'picture';
   if (request.action === 'community') return request.name;
   return request.name;

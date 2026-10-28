@@ -1,3 +1,4 @@
+import { itemAddress } from './directory';
 import { demoCid } from './ids';
 import type { ForgeRequest, Item, ObjectFile, ObjectKind } from './types';
 
@@ -158,6 +159,7 @@ export function itemFromMint(id: string, request: MintRequest, objectCid: string
     cid: objectCid,
     dogeTxid,
     forgedHere: true,
+    address: itemAddress(id),
     urn: request.urn.trim() || (main ? `IPFS:${main.cid}/${main.name}` : objectCid),
     uri: request.uri,
     img: image ? `IPFS:${image.cid}/${image.name}` : null,

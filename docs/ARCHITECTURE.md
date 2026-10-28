@@ -1,18 +1,34 @@
 # How the Forge keeps things
 
+*Decentralized content monetization, powered by $MEOWE.*
+
 This note is the plan for the live portal. The website you can click today is still a guest demo: nothing is written to a chain, and nothing is uploaded. The pictures you pick stay on your device.
 
 A longer version of the same idea, with the Sup files named, is at the bottom. You do not need that section to follow the plan.
 
 ## 1. Where data lives
 
+**Ownership** is its own Dogecoin transaction, in the Sup P2FK (Pay to Future Key) style: a profile, a store mint, a Space, a channel, a give, or a buy. Prices for these are not published yet. A mint screen shows **— MEOWE**.
+
+**Paid actions** are a follow and a message. They are paid in MEOWE on Solana. The portal records them to Dogecoin in periodic batches, not as one Dogecoin transaction per message. No tiny Dogecoin payment is made for each message. A message in a channel is sent to that channel’s object address.
+
+Private messages, when they are built, stay end-to-end encrypted to the recipient profile’s PKX and PKY. Like open messages, they are paid in MEOWE on Solana and covered by the same periodic Dogecoin batch. <!-- [CONFIRM] Private messages are batched like public messages. Owner to confirm. --> The Messages screen is a sample. Nothing on it is sent.
+
 There are two kinds of things.
 
-**Open Space chat.** A message in a public channel costs about one penny, paid in MEOWE. The fee splits the same way as the rest of the portal: 30% is burned, 60% is swapped to DOGE to pay for the Dogecoin record, and 10% goes to community nodes. The words and any picture are the content. That content is pinned on IPFS, which gives it a content id (a CID). A short note on Solana, called a memo, is a small piece of JSON. Its job is to point at that content id. The memo is not the whole message.
+**Open Space chat.** A message in a public channel costs about one penny, paid in MEOWE. The fee splits the same way as the rest of the portal: 30% is burned, 60% is swapped to DOGE for the treasury, and 10% goes to community nodes. The words and any picture are the content. That content is pinned on IPFS, which gives it a content id (a CID). A short note on Solana, called a memo, is a small piece of JSON. Its job is to point at that content id. The memo is not the whole message.
 
-One message on its own is not also copied onto Dogecoin. Once a day, the portal writes **one** Dogecoin record for that day. Inside it is a Merkle root: a short fingerprint of every open message from that day. Anyone who still has a message can check it against that fingerprint and show that the message existed that day and was not changed later. The exact hash used to build the fingerprint is still to be confirmed.
+One message on its own is not also copied onto Dogecoin. Periodically, the portal writes **one** Dogecoin record for that batch. Inside it is a Merkle root: a short fingerprint of every open message from that period. Anyone who still has a message can check it against that fingerprint and show that the message existed then and was not changed later. That batch is the Dogecoin record for paid messages and follows. The one exception is the optional “Carve it on Doge” extra in section 4. The exact hash used to build the fingerprint is still to be confirmed.
 
-**Things a profile owns.** A profile and a storefront item are Dogecoin objects in the Sup style, called P2FK (pay to a future key). The files themselves sit on IPFS. The Dogecoin record is what says who owns the object. We pin every file on our own IPFS node (Kubo), and we also use public pinning services so a file is not kept in only one place. We run our own Dogecoin indexer, which is the reader that turns those records back into profiles, items, Spaces, and messages. A store item can hold more than one file. The fields are in the Objects section below.
+**Things a profile owns.** A profile, a storefront item, a Space, and a channel are Dogecoin objects in the Sup style, called P2FK (Pay to Future Key). The files themselves sit on IPFS. The Dogecoin record is what says who owns the object. We pin every file on our own IPFS node (Kubo), and we also use public pinning services so a file is not kept in only one place. We run our own Dogecoin indexer, which is the reader that turns those records back into profiles, items, Spaces, channels, and messages. It reads Dogecoin from the first block (block 0) and runs on Dogecoin Core 1.14.6 only, because newer versions reorder `sendmany` outputs and P2FK depends on that order. A store item can hold more than one file. The fields are in the Objects section below.
+
+### Spaces and channels
+
+A Space is an object with `lic` `meowe:space`. A text channel is minted as its own object with `lic` `meowe:space:channel` and `uri` set to the parent Space’s object address. That is the same shape as a Cthulhu topic (`cthulhu:tether:topic` pointing at a `cthulhu:tether` parent), with Meowecoin’s license tags.
+
+A channel counts only when its creator is the Space’s owner. Messages in the channel are sent to the channel’s own address. Giving or selling a Space moves its channels with it. A Space is sold by listing it in the owner’s store.
+
+Every object — a store item, a profile, a Space, a channel — has its own address. That address is its first creator address (`cre[0]`). Each object has its own chat at that address. A message can carry any object as a card: pick it from your store, or paste its address.
 
 ## Objects
 
@@ -63,6 +79,8 @@ The Forge plan for a private message:
 4. Put a Solana memo on chain that carries the content id, not the readable text.
 5. The recipient decrypts with their own private key.
 
+A private message is then covered by the same periodic Dogecoin batch as open messages. The batch holds only a fingerprint, never readable text. <!-- [CONFIRM] Private messages are batched like public messages. Owner to confirm. -->
+
 Who sent it, who received it, and when, may still be visible on chain. Sup does not hide that. Whether the Forge will hide it is still to be confirmed.
 
 This is not built. `src/services/mockEncryption.ts` is a labeled stand-in. It does not encrypt, and it does not keep the text.
@@ -93,17 +111,21 @@ Sup does this on its Bitcoin-style P2FK chain. It does not use a Solana memo. Th
 
 ## 3. Buying from a store
 
-For now, a purchase happens on that profile’s own storefront. There is no separate marketplace. The item screen says **Trading coming soon** until a real purchase path exists.
+A purchase happens on the owner’s own store. That includes a Space, which is listed in its owner’s store and moves with its channels when it is sold. Each sale is its own Dogecoin transaction. There is no shared marketplace at first. A shared marketplace that lists items from every store is planned for later.
+
+In this demo, nothing can be bought yet. The item screen says **Trading coming soon**, and the **Marketplace** tab is marked **SOON**.
 
 ## 4. Ideas that are not built
 
 These are later ideas. They are not in the demo, and they have no button.
 
 - **Paid promotion.** A creator can pay a fee to advertise to everyone. Half of that fee, 50%, is burned. The rest of the details are still to be decided, including the price.
-- **Carve it on Doge.** An optional upgrade on a single message that writes that one message out in full on Dogecoin, instead of leaving it under the daily fingerprint only. The price and the exact record shape are still to be confirmed.
+- **Carve it on Doge.** An optional upgrade on a single message that writes that one message out in full on Dogecoin, instead of leaving it only in the periodic batch record. It is opt-in, one message at a time, and it is the one exception to batching. The price and the exact record shape are still to be confirmed.
 
 ## Where the code will plug in
 
 Screens never talk to a chain themselves. `src/services/createServices.ts` is the one wiring point. Private messages will go through `EncryptionService` (`encryptFor(pkx, pky, plaintext)` and `decrypt`). Today that is `MockEncryption`.
 
 Not financial advice. DYOR.
+
+*Memes are forever on Doge.*

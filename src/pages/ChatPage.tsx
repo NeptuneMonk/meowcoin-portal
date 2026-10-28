@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { AttachMenu } from '../components/AttachMenu';
+import { ChannelDetails } from '../components/ChannelDetails';
 import { Icon } from '../components/Icons';
 import { MessageStream, type StreamItem } from '../components/MessageStream';
+import { ObjectCard } from '../components/ObjectCard';
 import { ComingSoon, Forging, useSimulatedSubmit } from '../components/RecordFlow';
 import { FeeSplit } from '../components/FeeSplit';
 import { formatMeowe } from '../format';
@@ -34,9 +37,20 @@ export function ChatPage({
   const flow = useSimulatedSubmit();
   const [text, setText] = useState('');
   const [image, setImage] = useState<string | null>(null);
+  const [shared, setShared] = useState<string | null>(null);
+  const [details, setDetails] = useState(false);
   const [query, setQuery] = useState('');
   const scroller = useRef<HTMLDivElement>(null);
   usePageTitle(channel && !inert ? `#${channel.name} — The Forge` : 'Chat — The Forge');
+
+  useEffect(() => {
+    setText('');
+    setImage(null);
+    setShared(null);
+    setDetails(false);
+    setQuery('');
+    flow.setStep('edit');
+  }, [channel?.id]);
 
   useEffect(() => {
     const node = scroller.current;
@@ -48,7 +62,7 @@ export function ChatPage({
 
   if (!space || !channel) return inert ? null : <NotFound />;
 
-  const canSend = text.trim().length > 0 || Boolean(image);
+  const canSend = text.trim().length > 0 || Boolean(image) || Boolean(shared);
 
   function onFile(file: File | undefined) {
     if (!file) return;
@@ -63,9 +77,14 @@ export function ChatPage({
         <span className="hash" style={{ color: 'var(--dim)', fontSize: 24 }}>
           #
         </span>
-        <span className="t">{channel.name}</span>
+        <button className="t name-btn" type="button" onClick={() => setDetails(true)}>
+          {channel.name}
+        </button>
         <span className="topic">{channel.topic}</span>
         <div className="tools">
+          <button className="tool" type="button" aria-label={`Details for #${channel.name}`} onClick={() => setDetails(true)}>
+            <Icon name="info" />
+          </button>
           <span className="tool" aria-hidden="true">
             <Icon name="bell" />
           </span>
@@ -91,12 +110,17 @@ export function ChatPage({
         </Link>
         <span style={{ color: 'var(--dim)', fontSize: 24 }}>#</span>
         <div>
-          <div className="t">{channel.name}</div>
+          <button className="t name-btn" type="button" onClick={() => setDetails(true)}>
+            {channel.name}
+          </button>
           <div className="s">
             {space.name} · <Icon name="chain" /> on-chain Space
           </div>
         </div>
         <div className="r">
+          <button className="tool" type="button" aria-label={`Details for #${channel.name}`} onClick={() => setDetails(true)}>
+            <Icon name="info" />
+          </button>
           <Icon name="search" />
           <Icon name="people" />
         </div>
@@ -108,20 +132,32 @@ export function ChatPage({
             <div className="big">#</div>
             <h2>Welcome to #{channel.name}!</h2>
             <p>
-              This is the start of the #{channel.name} channel in <b>{space.name}</b>.
+              This is the start of the #{channel.name} channel in <b>{space.name}</b>. Messages here are sent to this channel’s object address.
             </p>
           </div>
           {rows.length === 0 ? <p className="micro pad">No messages yet.</p> : <MessageStream items={rows} />}
         </div>
       </div>
 
-      {image ? (
+      {image || shared ? (
         <div className="attach-preview">
-          <img src={image} alt="Image that stays on this device" />
-          <button className="btn ghost" type="button" onClick={() => setImage(null)}>
+          {image ? <img src={image} alt="Image that stays on this device" /> : null}
+          {shared ? (
+            <div className="preview-card">
+              <ObjectCard address={shared} />
+            </div>
+          ) : null}
+          <button
+            className="btn ghost"
+            type="button"
+            onClick={() => {
+              setImage(null);
+              setShared(null);
+            }}
+          >
             Remove
           </button>
-          <span className="micro">Your image stays on your device in demo mode.</span>
+          {image ? <span className="micro">Your image stays on your device in demo mode.</span> : null}
         </div>
       ) : null}
 
@@ -132,7 +168,7 @@ export function ChatPage({
           if (!inert && canSend) flow.setStep('quote');
         }}
       >
-        <FileButton onFile={onFile} />
+        <AttachMenu key={`${channel.id}-desk`} onFile={onFile} onObject={setShared} />
         <textarea
           value={text}
           maxLength={280}
@@ -164,7 +200,7 @@ export function ChatPage({
           if (canSend) flow.setStep('quote');
         }}
       >
-        <FileButton onFile={onFile} round />
+        <AttachMenu key={`${channel.id}-mob`} round onFile={onFile} onObject={setShared} />
         <label className="f">
           <span className="sr-only">Message</span>
           <textarea
@@ -187,6 +223,7 @@ export function ChatPage({
             </div>
             <div className="bd">
               {image ? <img className="upload-preview" src={image} alt="Image that stays on this device" /> : null}
+              {shared ? <ObjectCard address={shared} /> : null}
               {text.trim() ? <p className="draft">“{text.trim()}”</p> : null}
               {flow.step === 'quote' ? (
                 <>
@@ -214,6 +251,7 @@ export function ChatPage({
                   if (flow.step === 'done') {
                     setText('');
                     setImage(null);
+                    setShared(null);
                   }
                   flow.setStep('edit');
                 }}
@@ -230,6 +268,7 @@ export function ChatPage({
                       channelId: channel.id,
                       text: text.trim(),
                       localImageUrl: image,
+                      sharedAddress: shared,
                       quote: MESSAGE_QUOTE,
                     })
                   }
@@ -241,26 +280,8 @@ export function ChatPage({
           </div>
         </div>
       ) : null}
+      {details ? <ChannelDetails space={space} channel={channel} onClose={() => setDetails(false)} /> : null}
     </div>
-  );
-}
-
-function FileButton({ onFile, round = false }: { onFile: (file: File | undefined) => void; round?: boolean }) {
-  return (
-    <label className={round ? 'pl' : 'ico'}>
-      <span className="sr-only">Image</span>
-      <Icon name={round ? 'plus' : 'add'} />
-      <input
-        className="file-input"
-        type="file"
-        accept="image/*"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          event.target.value = '';
-          onFile(file);
-        }}
-      />
-    </label>
   );
 }
 
@@ -290,10 +311,12 @@ function toRows(messages: readonly ChatMessage[], owner: string, query: string):
       cont,
       image: message.localImageUrl,
       owner: message.handle === owner,
+      sharedAddress: message.sharedAddress,
       record: {
         burned: message.burned,
         cid: message.cid,
         dogeTxid: message.dogeTxid,
+        sentTo: message.sentTo,
       },
     });
     prev = message;

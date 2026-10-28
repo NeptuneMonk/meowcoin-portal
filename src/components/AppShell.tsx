@@ -14,14 +14,16 @@ import {
 export function AppShell() {
   const { pathname } = useLocation();
   const mobile = useMedia('(max-width: 699px)');
-  const channel = useMatch('/c/:communityId/:channelId');
+  const mintChannel = useMatch('/c/:communityId/new-channel');
+  const channelMatch = useMatch('/c/:communityId/:channelId');
+  const channel = mintChannel ? null : channelMatch;
   const spaceOnly = useMatch('/c/:communityId');
   const dm = useMatch('/chats/:handle');
   const profile = useMatch('/u/:handle');
   const profileTab = useMatch('/u/:handle/:tab');
   const minting = pathname === '/communities/new';
   const forgeOn = pathname === '/about';
-  const routeSpace = channel?.params.communityId ?? spaceOnly?.params.communityId;
+  const routeSpace = mintChannel?.params.communityId ?? channel?.params.communityId ?? spaceOnly?.params.communityId;
   const sideSpace = routeSpace ?? (minting && !mobile ? 'nine-lives' : undefined);
   const messagesOn = !routeSpace && !minting && !forgeOn;
   const onMessages = pathname === '/' || pathname === '/chats' || Boolean(dm);
@@ -46,7 +48,7 @@ export function AppShell() {
         <div className="stage">
           <Outlet />
         </div>
-        {sideSpace && (channel || minting) ? <MemberPanel communityId={sideSpace} /> : null}
+        {sideSpace && (channel || minting || mintChannel) ? <MemberPanel communityId={sideSpace} /> : null}
         {!sideSpace && onMessages && activeDm ? <DmProfile handle={activeDm} /> : null}
         <UserPanel />
         <MobileUserBar />
